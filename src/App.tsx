@@ -9,6 +9,7 @@ import { QueryTest } from '@/components/QueryTest'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
 import { Input } from '@/components/ui/Input'
+import { AnimationExamples } from '@/components/examples/AnimationExamples'
 
 function App() {
   const [count, setCount] = useState(0)
@@ -122,6 +123,11 @@ function App() {
             </Card>
           </div>
         </Card>
+      </div>
+
+      {/* Animation Examples - Issue #11 */}
+      <div className="mt-8">
+        <AnimationExamples />
       </div>
     </>
   )

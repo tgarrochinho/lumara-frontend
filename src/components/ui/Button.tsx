@@ -1,6 +1,7 @@
 import { forwardRef, type ButtonHTMLAttributes } from 'react'
 import { motion } from 'framer-motion'
 import { cn } from '@/utils/cn'
+import { useReducedMotion } from '@/hooks/useReducedMotion'
 
 interface ButtonProps
   extends Omit<
@@ -17,12 +18,18 @@ interface ButtonProps
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant = 'primary', size = 'md', ...props }, ref) => {
+    const prefersReducedMotion = useReducedMotion()
+
     return (
       <motion.button
         ref={ref}
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}
-        transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+        whileHover={prefersReducedMotion ? {} : { scale: 1.02 }}
+        whileTap={prefersReducedMotion ? {} : { scale: 0.98 }}
+        transition={
+          prefersReducedMotion
+            ? { duration: 0 }
+            : { type: 'spring', stiffness: 400, damping: 17 }
+        }
         className={cn(
           'rounded-lg font-medium transition-colors',
           {

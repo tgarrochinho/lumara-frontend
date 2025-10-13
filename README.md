@@ -1,73 +1,181 @@
-# React + TypeScript + Vite
+# Lumara - Your Metacognitive AI Partner
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Lumara is a metacognitive AI partner designed to help you build personal truth through tracking how your understanding evolves over time. Unlike traditional knowledge tools that store what sources say, Lumara tracks how *you* interpret and reinterpret information, helping you discover what truly works for you.
 
-Currently, two official plugins are available:
+## What Makes Lumara Different
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+**Three Types of Truth:**
+- **External Truth** (what sources say) - ChatGPT/Claude do this
+- **Collective Truth** (what documents reveal) - Tools like Supermemory do this
+- **Personal Truth** (what works for YOU) - **Only Lumara does this**
 
-## React Compiler
+Lumara tracks your understanding evolution:
+```
+January: "Coach said continental grip"
+         You understood: "For all serves"
+         Tested: 40% success
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+February: "Coach said continental grip"
+          You understood: "Only for flat serves"
+          Tested: 70% success
 
-## Expanding the ESLint configuration
+March: "Coach said continental grip"
+       You understood: "It's about wrist angle"
+       Tested: 85% success
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+Your Personal Truth: Context-dependent technique
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+**The source didn't change. Your understanding evolved. Lumara tracks that.**
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Features
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+- **Understanding Evolution**: Track how your interpretation of information changes over time
+- **Local-First Architecture**: All data stored locally with offline support via IndexedDB
+- **Memory Psychology**: UI organized around how human memory actually works (Working → Episodic → Semantic → Procedural)
+- **Modern Tech Stack**: React 19, TypeScript, Vite, Tailwind CSS
+- **Smooth Animations**: Framer Motion and GSAP for delightful interactions
+- **Type-Safe**: Full TypeScript coverage with strict mode
+- **Real-Time State**: Zustand for global state, TanStack Query for server state
+
+## Prerequisites
+
+- Node.js 18+
+- npm 9+
+
+## Quick Start
+
+### Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/tgarrochinho/lumara-frontend.git
+cd lumara-frontend
+
+# Install dependencies
+npm install
 ```
+
+### Development
+
+```bash
+# Start development server with hot module replacement
+npm run dev
+```
+
+Open [http://localhost:5173](http://localhost:5173) in your browser. The dev server will automatically open the browser for you.
+
+### Build for Production
+
+```bash
+# Type check and build
+npm run build
+```
+
+Build output will be in the `dist/` directory.
+
+### Preview Production Build
+
+```bash
+# Preview the production build locally
+npm run preview
+```
+
+## Available Scripts
+
+| Script | Description |
+|--------|-------------|
+| `npm run dev` | Start Vite development server with HMR on port 5173 |
+| `npm run build` | Type check with TypeScript and build for production |
+| `npm run preview` | Preview production build locally |
+| `npm run lint` | Run ESLint to check for code quality issues |
+| `npm run lint:fix` | Run ESLint and automatically fix issues |
+| `npm run format` | Format all source files with Prettier |
+| `npm run format:check` | Check if files are formatted correctly (useful for CI) |
+
+## Project Structure
+
+```
+lumara-frontend/
+├── src/
+│   ├── components/          # React components
+│   │   ├── ui/              # Base UI components (Button, Card, Input)
+│   │   ├── QueryTest.tsx    # TanStack Query demo
+│   │   ├── StoreTest.tsx    # Zustand store demo
+│   │   └── DexieTest.tsx    # Dexie database demo
+│   ├── lib/                 # Core libraries
+│   │   ├── store.ts         # Zustand state management
+│   │   ├── db.ts            # Dexie IndexedDB configuration
+│   │   └── query.ts         # TanStack Query client setup
+│   ├── hooks/               # Custom React hooks
+│   │   └── useExampleQuery.ts
+│   ├── utils/               # Utility functions
+│   │   └── cn.ts            # className merging utility
+│   ├── styles/              # Global styles
+│   │   └── globals.css      # Tailwind directives and global CSS
+│   ├── features/            # Feature-specific components (coming soon)
+│   ├── types/               # TypeScript type definitions
+│   └── assets/              # Static assets
+├── .claude/                 # Claude Code configuration and MCP tools
+├── docs/                    # Product specifications and planning
+├── public/                  # Static public assets
+└── dist/                    # Production build output (generated)
+```
+
+## Technology Stack
+
+### Core
+- **Frontend Framework**: [React 19](https://react.dev/) - Latest React with improved hooks and concurrent features
+- **Language**: [TypeScript 5.9](https://www.typescriptlang.org/) - Type safety and enhanced developer experience
+- **Build Tool**: [Vite 7](https://vitejs.dev/) - Lightning-fast HMR and optimized builds
+
+### Styling
+- **CSS Framework**: [Tailwind CSS 4](https://tailwindcss.com/) - Utility-first CSS with custom brand design tokens
+- **Animations**: [Framer Motion 12](https://www.framer.com/motion/) + [GSAP 3](https://greensock.com/gsap/) - Smooth, performant animations
+
+### State Management
+- **Client State**: [Zustand 5](https://github.com/pmndrs/zustand) - Minimal, hook-based state management
+- **Server State**: [TanStack Query 5](https://tanstack.com/query/) - Async state management with caching
+- **Database**: [Dexie 4](https://dexie.org/) - IndexedDB wrapper for local-first data persistence
+
+### Code Quality
+- **Linting**: [ESLint 9](https://eslint.org/) - Code quality and best practices
+- **Formatting**: [Prettier 3](https://prettier.io/) - Consistent code formatting
+- **Type Checking**: TypeScript strict mode with comprehensive compiler options
+
+## Development Features
+
+- **Hot Module Replacement (HMR)**: Instant updates during development
+- **Path Aliases**: Use `@/*` imports for cleaner imports (e.g., `@/components/ui/Button`)
+- **Redux DevTools**: Zustand store integration for debugging
+- **React Query DevTools**: Visual debugging for server state
+- **Source Maps**: Full source maps in production builds for debugging
+
+## Learn More
+
+For detailed development guidelines, architecture overview, and code patterns, see [DEVELOPMENT.md](./DEVELOPMENT.md).
+
+### Documentation
+- [Product Vision & Planning](./docs/) - Product specifications and strategic decisions
+- [MCP Tools Guide](./MCP_TOOLS.md) - Browser automation and testing tools
+- [Claude Code Config](./CLAUDE.md) - Development workflow with Claude
+
+### External Resources
+- [Vite Documentation](https://vitejs.dev/)
+- [React Documentation](https://react.dev/)
+- [Tailwind CSS Documentation](https://tailwindcss.com/)
+- [Zustand Documentation](https://github.com/pmndrs/zustand)
+- [TanStack Query Documentation](https://tanstack.com/query/)
+- [Dexie.js Documentation](https://dexie.org/)
+
+## Contributing
+
+This project is in active development. Contributions, issues, and feature requests are welcome!
+
+## License
+
+This project is part of the Lumara ecosystem.
+
+---
+
+**Built with modern web technologies for a local-first, privacy-focused experience.**

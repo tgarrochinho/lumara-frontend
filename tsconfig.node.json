@@ -1,26 +1,48 @@
 {
+  /**
+   * Node.js TypeScript Configuration
+   *
+   * This configuration applies to Node.js build tooling files like vite.config.ts.
+   * It's separate from the app config because build tools run in Node.js, not the browser.
+   *
+   * Key Differences from tsconfig.app.json:
+   * - target: ES2023 (Node.js supports latest features)
+   * - lib: ES2023 only (no DOM, since Node.js doesn't have browser APIs)
+   * - types: "node" (Node.js type definitions like process, __dirname, etc.)
+   * - include: Only vite.config.ts (not the entire src/ directory)
+   *
+   * This separation keeps IDE/compiler fast by not mixing browser and Node.js contexts.
+   *
+   * @see https://www.typescriptlang.org/tsconfig
+   */
   "compilerOptions": {
+    /* Build Cache */
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
-    "target": "ES2023",
-    "lib": ["ES2023"],
-    "module": "ESNext",
-    "types": ["node"],
-    "skipLibCheck": true,
 
-    /* Bundler mode */
-    "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
-    "verbatimModuleSyntax": true,
-    "moduleDetection": "force",
-    "noEmit": true,
+    /* Language and Environment */
+    "target": "ES2023",                     // Node.js supports latest ES features
+    "lib": ["ES2023"],                      // Only ES2023 APIs (no DOM, since this is Node.js)
+    "module": "ESNext",                     // Use latest module system
+    "types": ["node"],                      // Node.js type definitions (process, __dirname, etc.)
+    "skipLibCheck": true,                   // Skip type checking of .d.ts files (faster builds)
 
-    /* Linting */
-    "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "erasableSyntaxOnly": true,
-    "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true
+    /* Bundler Mode */
+    // Vite uses esbuild to bundle config files, so we use bundler resolution
+    "moduleResolution": "bundler",          // Use bundler-specific resolution algorithm
+    "allowImportingTsExtensions": true,     // Allow importing .ts files in config
+    "verbatimModuleSyntax": true,           // Preserve import/export syntax exactly as written
+    "moduleDetection": "force",             // Always treat files as modules
+    "noEmit": true,                         // Don't emit JS files (Vite handles it)
+
+    /* Linting and Type Safety */
+    "strict": true,                         // Enable all strict type checking options
+    "noUnusedLocals": true,                 // Error on unused local variables
+    "noUnusedParameters": true,             // Error on unused function parameters
+    "erasableSyntaxOnly": true,             // Only allow erasable TypeScript syntax
+    "noFallthroughCasesInSwitch": true,     // Error on switch fallthrough without break
+    "noUncheckedSideEffectImports": true    // Error on imports that might have side effects
   },
-  "include": ["vite.config.ts"]
+
+  /* Source Files */
+  "include": ["vite.config.ts"]             // Only include build tooling files (not src/)
 }

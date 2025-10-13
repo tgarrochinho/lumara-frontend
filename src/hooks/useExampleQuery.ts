@@ -136,7 +136,9 @@ export function useRefreshDatabase() {
       queryClient.invalidateQueries({
         queryKey: databaseQueryKeys.info(),
       })
-      console.log('[useExampleQuery] Database info invalidated, refetch triggered')
+      console.log(
+        '[useExampleQuery] Database info invalidated, refetch triggered'
+      )
     },
     onError: error => {
       console.error('[useExampleQuery] Error refreshing database:', error)

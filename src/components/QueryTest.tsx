@@ -98,8 +98,7 @@ export function QueryTest() {
             {data.tables.length > 0 ? data.tables.join(', ') : '(empty schema)'}
           </p>
           <p style={{ marginTop: '8px', opacity: 0.7, fontSize: '12px' }}>
-            Last updated:{' '}
-            {new Date(dataUpdatedAt).toLocaleTimeString()}
+            Last updated: {new Date(dataUpdatedAt).toLocaleTimeString()}
           </p>
         </div>
       )}

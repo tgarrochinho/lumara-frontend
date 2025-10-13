@@ -2,9 +2,14 @@ import { useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
+import { testPathAlias, greet } from '@/utils/test'
 
 function App() {
   const [count, setCount] = useState(0)
+
+  // Test path aliases
+  console.log(testPathAlias())
+  console.log(greet('Lumara'))
 
   return (
     <>

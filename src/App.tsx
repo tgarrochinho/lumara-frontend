@@ -67,7 +67,9 @@ function App() {
           {/* Button variants */}
           <div className="space-y-4">
             <div>
-              <h3 className="text-sm font-medium text-white/60 mb-2">Button Variants</h3>
+              <h3 className="text-sm font-medium text-white/60 mb-2">
+                Button Variants
+              </h3>
               <div className="flex flex-wrap gap-2">
                 <Button variant="primary">Primary</Button>
                 <Button variant="secondary">Secondary</Button>
@@ -77,7 +79,9 @@ function App() {
 
             {/* Button sizes */}
             <div>
-              <h3 className="text-sm font-medium text-white/60 mb-2">Button Sizes</h3>
+              <h3 className="text-sm font-medium text-white/60 mb-2">
+                Button Sizes
+              </h3>
               <div className="flex flex-wrap items-center gap-2">
                 <Button size="sm">Small</Button>
                 <Button size="md">Medium</Button>
@@ -89,19 +93,28 @@ function App() {
           {/* Input component */}
           <div className="space-y-4">
             <div>
-              <h3 className="text-sm font-medium text-white/60 mb-2">Input Component</h3>
+              <h3 className="text-sm font-medium text-white/60 mb-2">
+                Input Component
+              </h3>
               <Input placeholder="Enter your text here..." />
             </div>
 
             <div>
-              <h3 className="text-sm font-medium text-white/60 mb-2">Input with Error</h3>
-              <Input placeholder="Invalid input" error="This field is required" />
+              <h3 className="text-sm font-medium text-white/60 mb-2">
+                Input with Error
+              </h3>
+              <Input
+                placeholder="Invalid input"
+                error="This field is required"
+              />
             </div>
           </div>
 
           {/* Nested Card */}
           <div>
-            <h3 className="text-sm font-medium text-white/60 mb-2">Nested Card</h3>
+            <h3 className="text-sm font-medium text-white/60 mb-2">
+              Nested Card
+            </h3>
             <Card className="bg-white/3">
               <p className="text-white/80">
                 Cards can be nested and styled with custom classes

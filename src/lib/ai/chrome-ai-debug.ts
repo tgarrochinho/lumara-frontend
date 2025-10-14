@@ -38,7 +38,9 @@ export async function debugChromeAI(): Promise<ChromeAIDebugInfo> {
 
   // Check multiple possible API locations
   const possibleLocations = [
+    { path: 'LanguageModel (global)', value: typeof LanguageModel !== 'undefined' ? LanguageModel : undefined },
     { path: 'window.ai', value: (window as any).ai },
+    { path: 'window.ai.languageModel', value: (window as any).ai?.languageModel },
     { path: 'window.chrome?.ai', value: (window as any).chrome?.ai },
     { path: 'navigator.ai', value: (navigator as any).ai },
     { path: 'self.ai', value: (self as any).ai },

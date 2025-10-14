@@ -16,13 +16,24 @@ import { ProviderInitializationError } from '../types';
  * These are not yet in TypeScript's standard library
  */
 declare global {
+  // Latest API (Chrome 141+) - Global LanguageModel
+  const LanguageModel: {
+    availability: () => Promise<'readily' | 'after-download' | 'no'>;
+    params: () => Promise<{
+      defaultTemperature: number;
+      defaultTopK: number;
+      maxTopK: number;
+    }>;
+    create: (options?: AILanguageModelCreateOptions) => Promise<AILanguageModel>;
+  } | undefined;
+
   interface Window {
     ai?: {
       // Legacy API (Chrome <141)
       canCreateTextSession?: () => Promise<AISessionAvailability>;
       createTextSession?: (options?: AISessionOptions) => Promise<AITextSession>;
 
-      // New API (Chrome 141+)
+      // Transitional API (Chrome 128-140)
       languageModel?: {
         capabilities: () => Promise<AILanguageModelCapabilities>;
         create: (options?: AILanguageModelOptions) => Promise<AILanguageModel>;
@@ -44,7 +55,7 @@ interface AITextSession {
   destroy?: () => void;
 }
 
-// New API types (Chrome 141+)
+// Transitional API types (Chrome 128-140)
 interface AILanguageModelCapabilities {
   available: 'readily' | 'after-download' | 'no';
   defaultTemperature?: number;
@@ -60,8 +71,16 @@ interface AILanguageModelOptions {
   language?: string; // Required in newer versions: 'en', 'es', 'ja'
 }
 
+// Latest API types (Chrome 141+)
+interface AILanguageModelCreateOptions {
+  temperature?: number;
+  topK?: number;
+  systemPrompt?: string;
+  initialPrompts?: Array<{ role: string; content: string }>;
+}
+
 interface AILanguageModel {
-  prompt: (input: string, options?: { language?: string }) => Promise<string>;
+  prompt: (input: string) => Promise<string>;
   promptStreaming?: (input: string) => AsyncIterable<string>;
   destroy?: () => void;
 }
@@ -106,15 +125,43 @@ export class ChromeAIProvider extends BaseProvider {
    */
   async initialize(config?: ProviderConfig): Promise<void> {
     try {
-      // Check if Chrome AI API is available
-      if (!window.ai) {
-        throw new Error(
-          'Chrome AI not available. Use Chrome Canary/Dev (v127+) with Origin Trial enabled.'
-        );
+      // Try latest API first (Chrome 141+) - Global LanguageModel
+      if (typeof LanguageModel !== 'undefined') {
+        console.log('[ChromeAI] Using latest global LanguageModel API (Chrome 141+)');
+        this.usingNewAPI = true;
+
+        // Check availability
+        const availability = await LanguageModel.availability();
+
+        if (availability === 'no') {
+          throw new Error(
+            'Chrome AI is not available on this device. Your device may not support on-device AI.'
+          );
+        }
+
+        if (availability === 'after-download') {
+          throw new Error(
+            'Chrome AI model needs to be downloaded. Please wait for the download to complete and try again.'
+          );
+        }
+
+        // Create language model session
+        const modelOptions: AILanguageModelCreateOptions = {};
+
+        if (config?.temperature !== undefined) {
+          modelOptions.temperature = config.temperature;
+        }
+
+        this.session = await LanguageModel.create(modelOptions);
+        this.initialized = true;
+        this.config = config;
+
+        console.log(`${this.name} initialized successfully (latest global API)`);
+        return;
       }
 
-      // Try new API first (Chrome 141+)
-      if (window.ai.languageModel) {
+      // Try transitional API (Chrome 128-140)
+      if (window.ai?.languageModel) {
         console.log('[ChromeAI] Using new languageModel API (Chrome 141+)');
         this.usingNewAPI = true;
 
@@ -284,10 +331,8 @@ export class ChromeAIProvider extends BaseProvider {
       }
 
       // Get response from Chrome AI
-      // New API (Chrome 141+) requires language parameter
-      const response = this.usingNewAPI
-        ? await (this.session as AILanguageModel).prompt(prompt, { language: 'en' })
-        : await this.session.prompt(prompt);
+      // Latest API (Chrome 141+) simplified the prompt method
+      const response = await this.session.prompt(prompt);
 
       return response;
     } catch (error) {

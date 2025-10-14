@@ -52,10 +52,11 @@ describe('AIErrorState', () => {
 
     it('should display network error help', () => {
       const error = new NetworkError('Connection failed');
-      render(<AIErrorState error={error} onRetry={mockRetry} />);
+      const { container } = render(<AIErrorState error={error} onRetry={mockRetry} />);
 
       expect(screen.getByText('Network Issue')).toBeInTheDocument();
-      expect(screen.getByText(/check your internet connection/i)).toBeInTheDocument();
+      const helpSection = container.querySelector('.help-section');
+      expect(helpSection).toHaveTextContent(/check your internet connection/i);
     });
 
     it('should display embedding error help', () => {
@@ -71,7 +72,7 @@ describe('AIErrorState', () => {
       const error = new NetworkError('Connection failed');
       render(<AIErrorState error={error} onRetry={mockRetry} />);
 
-      const retryButton = screen.getByRole('button', { name: /try again/i });
+      const retryButton = screen.getByRole('button', { name: /retry ai initialization/i });
       expect(retryButton).toBeInTheDocument();
     });
 
@@ -80,7 +81,7 @@ describe('AIErrorState', () => {
       const error = new NetworkError('Connection failed');
       render(<AIErrorState error={error} onRetry={mockRetry} />);
 
-      const retryButton = screen.getByRole('button', { name: /try again/i });
+      const retryButton = screen.getByRole('button', { name: /retry ai initialization/i });
       await user.click(retryButton);
 
       expect(mockRetry).toHaveBeenCalledTimes(1);
@@ -91,7 +92,7 @@ describe('AIErrorState', () => {
       const error = new Error('Non-recoverable');
       render(<AIErrorState error={error} onRetry={mockRetry} />);
 
-      const retryButton = screen.queryByRole('button', { name: /try again/i });
+      const retryButton = screen.queryByRole('button', { name: /retry ai initialization/i });
       expect(retryButton).not.toBeInTheDocument();
     });
   });

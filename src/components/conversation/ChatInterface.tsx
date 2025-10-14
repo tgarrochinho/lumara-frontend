@@ -5,10 +5,16 @@
  * Displays message history and provides input for new messages.
  */
 
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { useConversation, type Message } from '../../hooks/useConversation';
 import { InputField } from './InputField';
+import { MemoryExtraction } from './MemoryExtraction';
 import { formatTime } from '../../lib/utils/date';
+import {
+  extractMemoryFromConversation,
+  shouldExtractMemory,
+  type ExtractedMemory,
+} from '../../lib/ai/memory-extraction';
 
 /**
  * Main chat interface component
@@ -19,11 +25,52 @@ import { formatTime } from '../../lib/utils/date';
 export function ChatInterface() {
   const { messages, isTyping, sendMessage } = useConversation();
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [extractedMemory, setExtractedMemory] = useState<ExtractedMemory | null>(null);
+  const [isExtracting, setIsExtracting] = useState(false);
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isTyping]);
+
+  // Auto-extract memory after AI responses
+  useEffect(() => {
+    const attemptExtraction = async () => {
+      // Skip if conditions aren't met
+      if (isTyping || extractedMemory || isExtracting) return;
+      if (!shouldExtractMemory(messages)) return;
+
+      setIsExtracting(true);
+
+      try {
+        // Use last 5 messages for context
+        const recentMessages = messages.slice(-5).map(m => ({
+          role: m.role,
+          content: m.content,
+        }));
+        const extracted = await extractMemoryFromConversation(recentMessages);
+
+        if (extracted) {
+          setExtractedMemory(extracted);
+        }
+      } catch (error) {
+        console.error('Memory extraction failed:', error);
+      } finally {
+        setIsExtracting(false);
+      }
+    };
+
+    attemptExtraction();
+  }, [messages, isTyping, extractedMemory, isExtracting]);
+
+  const handleMemorySaved = () => {
+    setExtractedMemory(null);
+    // Success message logged by MemoryExtraction component
+  };
+
+  const handleMemoryCancelled = () => {
+    setExtractedMemory(null);
+  };
 
   const handleSend = async (content: string) => {
     if (!content.trim()) return;
@@ -59,6 +106,15 @@ export function ChatInterface() {
           </>
         )}
       </div>
+
+      {/* Memory Extraction Preview (if active) */}
+      {extractedMemory && (
+        <MemoryExtraction
+          extracted={extractedMemory}
+          onSave={handleMemorySaved}
+          onCancel={handleMemoryCancelled}
+        />
+      )}
 
       {/* Input Area */}
       <div className="border-t border-gray-200 p-4">

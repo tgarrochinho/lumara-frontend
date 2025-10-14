@@ -43,8 +43,8 @@ describe('useAIStatus', () => {
     // Mock successful provider selection
     vi.mocked(registry.selectProvider).mockResolvedValue(mockProvider);
 
-    // Mock embeddings service
-    vi.mocked(transformers.embeddingsService).mockReturnValue(mockEmbeddingsService as any);
+    // Mock embeddings service methods
+    Object.assign(transformers.embeddingsService, mockEmbeddingsService);
 
     // Mock health check
     mockProvider.healthCheck.mockResolvedValue({

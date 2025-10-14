@@ -14,9 +14,11 @@ import { AnimationExamples } from '@/components/examples/AnimationExamples'
 function App() {
   const [count, setCount] = useState(0)
 
-  // Test path aliases
-  console.log(testPathAlias())
-  console.log(greet('Lumara'))
+  // Test path aliases (development only)
+  if (import.meta.env.DEV) {
+    console.log(testPathAlias())
+    console.log(greet('Lumara'))
+  }
 
   return (
     <>

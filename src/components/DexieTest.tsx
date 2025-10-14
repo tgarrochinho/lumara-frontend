@@ -22,7 +22,9 @@ export function DexieTest() {
   useEffect(() => {
     const testDatabase = async () => {
       try {
-        console.log('[Dexie Test] Testing database connection...')
+        if (import.meta.env.DEV) {
+          console.log('[Dexie Test] Testing database connection...')
+        }
 
         const info = {
           name: db.name,
@@ -34,10 +36,14 @@ export function DexieTest() {
         setDbInfo(info)
         setStatus('success')
 
-        console.log('[Dexie Test] Database info:', info)
-        console.log('[Dexie Test] ✓ Database initialized successfully!')
+        if (import.meta.env.DEV) {
+          console.log('[Dexie Test] Database info:', info)
+          console.log('[Dexie Test] ✓ Database initialized successfully!')
+        }
       } catch (error) {
-        console.error('[Dexie Test] Database initialization error:', error)
+        if (import.meta.env.DEV) {
+          console.error('[Dexie Test] Database initialization error:', error)
+        }
         setStatus('error')
       }
     }

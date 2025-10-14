@@ -51,9 +51,6 @@ export const databaseQueryKeys = {
  */
 async function fetchDatabaseInfo(): Promise<DatabaseInfo> {
   try {
-    // Simulate a slight delay to demonstrate loading state
-    await new Promise(resolve => setTimeout(resolve, 100))
-
     const info: DatabaseInfo = {
       name: db.name,
       version: db.verno,
@@ -63,7 +60,9 @@ async function fetchDatabaseInfo(): Promise<DatabaseInfo> {
 
     return info
   } catch (error) {
-    console.error('[useExampleQuery] Error fetching database info:', error)
+    if (import.meta.env.DEV) {
+      console.error('[useExampleQuery] Error fetching database info:', error)
+    }
     throw error
   }
 }
@@ -127,7 +126,9 @@ export function useRefreshDatabase() {
   return useMutation({
     mutationFn: async () => {
       // Simulate a database operation that would trigger a refresh
-      console.log('[useExampleQuery] Refreshing database info...')
+      if (import.meta.env.DEV) {
+        console.log('[useExampleQuery] Refreshing database info...')
+      }
       await new Promise(resolve => setTimeout(resolve, 500))
       return true
     },
@@ -136,12 +137,16 @@ export function useRefreshDatabase() {
       queryClient.invalidateQueries({
         queryKey: databaseQueryKeys.info(),
       })
-      console.log(
-        '[useExampleQuery] Database info invalidated, refetch triggered'
-      )
+      if (import.meta.env.DEV) {
+        console.log(
+          '[useExampleQuery] Database info invalidated, refetch triggered'
+        )
+      }
     },
     onError: error => {
-      console.error('[useExampleQuery] Error refreshing database:', error)
+      if (import.meta.env.DEV) {
+        console.error('[useExampleQuery] Error refreshing database:', error)
+      }
     },
   })
 }
@@ -165,7 +170,9 @@ export function useUpdateDatabaseCache() {
 
   return (newData: DatabaseInfo) => {
     queryClient.setQueryData(databaseQueryKeys.info(), newData)
-    console.log('[useExampleQuery] Cache updated with new data:', newData)
+    if (import.meta.env.DEV) {
+      console.log('[useExampleQuery] Cache updated with new data:', newData)
+    }
   }
 }
 

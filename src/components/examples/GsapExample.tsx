@@ -5,18 +5,20 @@ import { Card } from '@/components/ui/Card'
 export function GsapExample() {
   const boxRef = useRef<HTMLDivElement>(null)
   const textRef = useRef<HTMLDivElement>(null)
+  const tlRef = useRef<gsap.core.Timeline | null>(null)
 
   useEffect(() => {
     if (boxRef.current && textRef.current) {
       // Create a timeline for complex sequenced animations
-      const tl = gsap.timeline({ repeat: -1, yoyo: true })
+      tlRef.current = gsap.timeline({ repeat: -1, yoyo: true })
 
-      tl.to(boxRef.current, {
-        x: 200,
-        rotation: 360,
-        duration: 2,
-        ease: 'power2.inOut',
-      })
+      tlRef.current
+        .to(boxRef.current, {
+          x: 200,
+          rotation: 360,
+          duration: 2,
+          ease: 'power2.inOut',
+        })
         .to(
           boxRef.current,
           {
@@ -42,7 +44,15 @@ export function GsapExample() {
     }
 
     return () => {
-      gsap.killTweensOf([boxRef.current, textRef.current])
+      // Kill the timeline first to stop infinite loop
+      if (tlRef.current) {
+        tlRef.current.kill()
+      }
+      // Then cleanup individual tweens, filtering out null refs
+      const targets = [boxRef.current, textRef.current].filter(Boolean)
+      if (targets.length > 0) {
+        gsap.killTweensOf(targets)
+      }
     }
   }, [])
 

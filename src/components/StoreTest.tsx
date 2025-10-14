@@ -18,6 +18,7 @@ import {
   useTheme,
   useUIActions,
 } from '../lib/store'
+import { useShallow } from 'zustand/react/shallow'
 
 export function StoreTest() {
   // Method 1: Using custom selector hooks (recommended)
@@ -30,12 +31,14 @@ export function StoreTest() {
   const sidebarOpen = useStore(state => state.sidebarOpen)
   const toggleSidebar = useStore(state => state.toggleSidebar)
 
-  // Method 3: Using multiple values from store
-  const { modalOpen, openModal, closeModal } = useStore(state => ({
-    modalOpen: state.modalOpen,
-    openModal: state.openModal,
-    closeModal: state.closeModal,
-  }))
+  // Method 3: Using multiple values from store (requires useShallow to prevent infinite loops)
+  const { modalOpen, openModal, closeModal } = useStore(
+    useShallow(state => ({
+      modalOpen: state.modalOpen,
+      openModal: state.openModal,
+      closeModal: state.closeModal,
+    }))
+  )
 
   return (
     <div style={{ padding: '2rem', maxWidth: '600px', margin: '0 auto' }}>

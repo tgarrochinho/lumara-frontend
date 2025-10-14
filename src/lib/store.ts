@@ -16,6 +16,7 @@
 
 import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'
+import { useShallow } from 'zustand/react/shallow'
 
 /**
  * UI State Slice
@@ -175,41 +176,49 @@ export const useCount = () => useStore(state => state.count)
 
 /** Get all counter actions */
 export const useCounterActions = () =>
-  useStore(state => ({
-    increment: state.increment,
-    decrement: state.decrement,
-    reset: state.reset,
-    setCount: state.setCount,
-  }))
+  useStore(
+    useShallow(state => ({
+      increment: state.increment,
+      decrement: state.decrement,
+      reset: state.reset,
+      setCount: state.setCount,
+    }))
+  )
 
 /** Get the current theme */
 export const useTheme = () => useStore(state => state.theme)
 
 /** Get all UI actions */
 export const useUIActions = () =>
-  useStore(state => ({
-    setTheme: state.setTheme,
-    toggleSidebar: state.toggleSidebar,
-    openSidebar: state.openSidebar,
-    closeSidebar: state.closeSidebar,
-    openModal: state.openModal,
-    closeModal: state.closeModal,
-  }))
+  useStore(
+    useShallow(state => ({
+      setTheme: state.setTheme,
+      toggleSidebar: state.toggleSidebar,
+      openSidebar: state.openSidebar,
+      closeSidebar: state.closeSidebar,
+      openModal: state.openModal,
+      closeModal: state.closeModal,
+    }))
+  )
 
 /** Get sidebar state */
 export const useSidebar = () =>
-  useStore(state => ({
-    isOpen: state.sidebarOpen,
-    toggle: state.toggleSidebar,
-    open: state.openSidebar,
-    close: state.closeSidebar,
-  }))
+  useStore(
+    useShallow(state => ({
+      isOpen: state.sidebarOpen,
+      toggle: state.toggleSidebar,
+      open: state.openSidebar,
+      close: state.closeSidebar,
+    }))
+  )
 
 /** Get modal state */
 export const useModal = () =>
-  useStore(state => ({
-    isOpen: state.modalOpen,
-    content: state.modalContent,
-    open: state.openModal,
-    close: state.closeModal,
-  }))
+  useStore(
+    useShallow(state => ({
+      isOpen: state.modalOpen,
+      content: state.modalContent,
+      open: state.openModal,
+      close: state.closeModal,
+    }))
+  )

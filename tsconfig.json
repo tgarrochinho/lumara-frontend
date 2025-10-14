@@ -1,0 +1,26 @@
+{
+  /**
+   * Root TypeScript Configuration
+   *
+   * This is the root tsconfig.json that orchestrates the project's TypeScript setup.
+   * It uses TypeScript's "project references" feature for better organization and build performance.
+   *
+   * Project References Benefits:
+   * - Faster builds (only rebuild what changed)
+   * - Better IDE performance
+   * - Clear separation between app code and build tooling
+   *
+   * Structure:
+   * - tsconfig.app.json: Application source code configuration (src/)
+   * - tsconfig.node.json: Build tooling configuration (vite.config.ts, etc.)
+   *
+   * This file itself has no source files - it just references the other configs.
+   *
+   * @see https://www.typescriptlang.org/docs/handbook/project-references.html
+   */
+  "files": [],
+  "references": [
+    { "path": "./tsconfig.app.json" },
+    { "path": "./tsconfig.node.json" }
+  ]
+}

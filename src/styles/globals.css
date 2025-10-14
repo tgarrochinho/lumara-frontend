@@ -1,0 +1,21 @@
+/* Tailwind CSS base styles */
+@import 'tailwindcss';
+
+/* Base layer customizations */
+@layer base {
+  /* Set dark mode as default with Lumara brand background */
+  html {
+    @apply bg-[#0A0E1A] text-white;
+  }
+
+  /* Ensure smooth font rendering */
+  body {
+    @apply antialiased;
+  }
+
+  /* Improve text rendering on macOS/iOS */
+  * {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}

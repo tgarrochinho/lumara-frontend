@@ -1,0 +1,55 @@
+{
+  /**
+   * Application TypeScript Configuration
+   *
+   * This configuration applies to application source code in the src/ directory.
+   * It enables strict type checking, modern JavaScript features, and path aliases.
+   *
+   * Key Features:
+   * - ES2022 target for modern JavaScript features
+   * - React JSX with automatic runtime (no need to import React)
+   * - Strict mode for maximum type safety
+   * - Path aliases (@/*) for cleaner imports
+   * - Bundler module resolution (optimized for Vite)
+   *
+   * @see https://www.typescriptlang.org/tsconfig
+   */
+  "compilerOptions": {
+    /* Build Cache */
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
+
+    /* Language and Environment */
+    "target": "ES2022",                     // Compile to ES2022 (modern browsers)
+    "useDefineForClassFields": true,        // Use standard class field semantics
+    "lib": ["ES2022", "DOM", "DOM.Iterable"], // Available APIs: ES2022 + Browser DOM
+    "module": "ESNext",                     // Use latest module system
+    "types": ["vite/client"],               // Type definitions for Vite (import.meta.env, etc.)
+    "skipLibCheck": true,                   // Skip type checking of .d.ts files (faster builds)
+
+    /* Bundler Mode */
+    // These options are optimized for Vite's bundler-based module resolution
+    "moduleResolution": "bundler",          // Use bundler-specific resolution algorithm
+    "allowImportingTsExtensions": true,     // Allow importing .ts/.tsx files directly
+    "verbatimModuleSyntax": true,           // Preserve import/export syntax exactly as written
+    "moduleDetection": "force",             // Always treat files as modules
+    "noEmit": true,                         // Don't emit JS files (Vite handles compilation)
+    "jsx": "react-jsx",                     // Use React 17+ JSX transform (no import React needed)
+
+    /* Linting and Type Safety */
+    "strict": true,                         // Enable all strict type checking options
+    "noUnusedLocals": true,                 // Error on unused local variables
+    "noUnusedParameters": true,             // Error on unused function parameters
+    "erasableSyntaxOnly": true,             // Only allow erasable TypeScript syntax (no enums, etc.)
+    "noFallthroughCasesInSwitch": true,     // Error on switch fallthrough without break
+    "noUncheckedSideEffectImports": true,   // Error on imports that might have side effects
+
+    /* Path Aliases */
+    "baseUrl": ".",                         // Base directory for path resolution
+    "paths": {
+      "@/*": ["./src/*"]                    // Map @/* to src/* for cleaner imports
+    }                                        // Example: import { Button } from '@/components/ui/Button'
+  },
+
+  /* Source Files */
+  "include": ["src"]                        // Only include files in src/ directory
+}

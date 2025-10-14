@@ -3,11 +3,11 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { HealthMonitor, healthMonitor, type HealthStatus } from '../health-monitor';
+import { HealthMonitor, healthMonitor } from '../health-monitor';
 import type { AIProvider, ProviderHealth } from '../types';
 
 // Mock AI Provider
-class MockProvider implements Partial<AIProvider> {
+class MockProvider implements AIProvider {
   name = 'MockProvider';
   type = 'local' as const;
   requiresApiKey = false;
@@ -18,7 +18,23 @@ class MockProvider implements Partial<AIProvider> {
     multimodal: false,
   };
 
-  healthCheckFn = vi.fn<[], Promise<ProviderHealth>>();
+  healthCheckFn = vi.fn();
+
+  async chat(_message: string, _context?: string[]): Promise<string> {
+    return `Mock response`;
+  }
+
+  async embed(_text: string): Promise<number[]> {
+    return new Array(384).fill(0.5);
+  }
+
+  async initialize(): Promise<void> {
+    return Promise.resolve();
+  }
+
+  async dispose(): Promise<void> {
+    return Promise.resolve();
+  }
 
   async healthCheck(): Promise<ProviderHealth> {
     return this.healthCheckFn();

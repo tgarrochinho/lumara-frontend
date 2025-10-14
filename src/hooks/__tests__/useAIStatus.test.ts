@@ -7,7 +7,6 @@ import { renderHook, waitFor } from '@testing-library/react';
 import { useAIStatus } from '../useAIStatus';
 import * as registry from '@/lib/ai/registry';
 import * as transformers from '@/lib/ai/embeddings/transformers';
-import { HealthMonitor } from '@/lib/ai/health-monitor';
 
 // Mock modules
 vi.mock('@/lib/ai/registry');
@@ -17,17 +16,20 @@ vi.mock('@/lib/ai/health-monitor');
 describe('useAIStatus', () => {
   const mockProvider = {
     name: 'Chrome AI',
-    type: 'chrome-ai' as const,
+    type: 'local' as const,
+    requiresApiKey: false,
     initialize: vi.fn(),
     dispose: vi.fn(),
     healthCheck: vi.fn(),
     chat: vi.fn(),
+    embed: vi.fn().mockResolvedValue(new Array(384).fill(0.5)),
     supportsStreaming: false,
     capabilities: {
       chat: true,
       streaming: false,
       functionCalling: false,
       embeddings: false,
+      multimodal: false,
     },
   };
 

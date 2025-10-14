@@ -74,7 +74,7 @@ export class LumaraDatabase extends Dexie {
       .stores({
         memories: '++id, content, type, createdAt, updatedAt, *tags',
       })
-      .upgrade(async (trans) => {
+      .upgrade(async (_trans) => {
         // Migration: existing memories get embedding = undefined
         // Embeddings will be generated lazily when needed
         console.log('Upgrading to v2: Adding memories table with embedding support')

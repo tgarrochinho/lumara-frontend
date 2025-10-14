@@ -7,7 +7,6 @@
 
 import { describe, it, expect, beforeEach } from 'vitest';
 import { MockAIProvider } from '../providers/mock';
-import { selectProvider } from '../registry';
 
 describe('AI Provider Abstraction', () => {
   let provider: MockAIProvider;

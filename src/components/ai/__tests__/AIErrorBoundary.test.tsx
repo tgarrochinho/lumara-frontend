@@ -2,7 +2,7 @@
  * Tests for AIErrorBoundary Component
  */
 
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeAll, afterAll } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { AIErrorBoundary } from '../AIErrorBoundary';
@@ -14,12 +14,12 @@ import {
 } from '@/lib/ai/error-handler';
 
 // Component that throws an error
-function ThrowError({ error }: { error: Error }): JSX.Element {
+function ThrowError({ error }: { error: Error }): null {
   throw error;
 }
 
 // Component that doesn't throw
-function NoError(): JSX.Element {
+function NoError() {
   return <div>Content</div>;
 }
 
@@ -148,7 +148,7 @@ describe('AIErrorBoundary', () => {
       let shouldThrow = true;
       const error = new NetworkError('timeout');
 
-      function ConditionalError(): JSX.Element {
+      function ConditionalError() {
         if (shouldThrow) {
           throw error;
         }
@@ -215,7 +215,7 @@ describe('AIErrorBoundary', () => {
       let shouldThrow = true;
       const error = new NetworkError('timeout');
 
-      function ConditionalError(): JSX.Element {
+      function ConditionalError() {
         if (shouldThrow) {
           throw error;
         }
@@ -350,7 +350,7 @@ describe('AIErrorBoundary', () => {
     it('should handle consecutive errors', () => {
       let errorToThrow: Error | null = new NetworkError('first');
 
-      function DynamicError(): JSX.Element {
+      function DynamicError() {
         if (errorToThrow) {
           throw errorToThrow;
         }
@@ -383,11 +383,11 @@ describe('AIErrorBoundary', () => {
     it('should allow nested error boundaries', () => {
       const innerError = new ProviderUnavailableError('Chrome AI');
 
-      function InnerThrow(): JSX.Element {
+      function InnerThrow(): null {
         throw innerError;
       }
 
-      function SafeContent(): JSX.Element {
+      function SafeContent() {
         return <div>Safe Content</div>;
       }
 

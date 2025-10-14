@@ -9,7 +9,6 @@ import type { SimilarityMatch } from '@/lib/ai/utils/similarity';
 import {
   saveMemoryWithEmbedding,
   getMemoriesWithEmbeddings,
-  type Memory,
   type MemoryType,
 } from '@/lib/db';
 import { useAIStatus } from './useAIStatus';

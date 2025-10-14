@@ -15,7 +15,6 @@ import {
   withRetry,
   AIErrorHandler,
   errorHandler,
-  type RetryOptions,
 } from '../error-handler';
 
 describe('AIError Classes', () => {

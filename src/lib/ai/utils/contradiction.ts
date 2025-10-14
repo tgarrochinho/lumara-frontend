@@ -5,8 +5,9 @@
  * between memories using AI-powered analysis combined with similarity metrics.
  */
 
-import { findSimilar, SimilarityMatch } from './similarity';
-import { AIProvider } from '../types';
+import { findSimilar } from './similarity';
+import type { SimilarityMatch } from './similarity';
+import type { AIProvider } from '../types';
 
 /**
  * Result of a contradiction analysis

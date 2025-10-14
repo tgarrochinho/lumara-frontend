@@ -79,10 +79,7 @@ export function useChat() {
       try {
         // Build context from previous messages (last 5 for context window)
         const recentMessages = messages.slice(-5);
-        const context = recentMessages.map(msg => ({
-          role: msg.role,
-          content: msg.content,
-        }));
+        const context = recentMessages.map(msg => msg.content);
 
         // Get AI response
         const response = await provider.chat(content, context);

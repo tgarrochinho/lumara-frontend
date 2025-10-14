@@ -5,8 +5,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import {
   db,
-  Memory,
-  MemoryType,
   saveMemoryWithEmbedding,
   updateMemoryEmbedding,
   getMemoriesWithEmbeddings,
@@ -15,6 +13,7 @@ import {
   ensureMemoryHasEmbedding,
   ensureAllMemoriesHaveEmbeddings,
 } from '../db'
+import type { Memory, MemoryType } from '../db'
 
 // Mock the embeddings module
 vi.mock('../ai/embeddings/transformers', () => ({
@@ -569,7 +568,7 @@ describe('Dexie Database Schema Extension', () => {
       await saveMemoryWithEmbedding({ content: 'Memory 2', type: 'experience' }, embedding)
 
       const progressCalls: number[] = []
-      await ensureAllMemoriesHaveEmbeddings((current, total) => {
+      await ensureAllMemoriesHaveEmbeddings((current, _total) => {
         progressCalls.push(current)
       })
 

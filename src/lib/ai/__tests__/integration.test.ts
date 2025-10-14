@@ -7,7 +7,6 @@
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { MockAIProvider } from '../providers/mock';
-import { generateEmbedding } from '../embeddings/transformers';
 import { findSimilar } from '../utils/similarity';
 import { detectContradictions } from '../utils/contradiction';
 import { embeddingCache } from '../embeddings/cache';

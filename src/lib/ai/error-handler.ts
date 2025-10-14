@@ -12,14 +12,21 @@
  * Base error class for all AI-related errors
  */
 export class AIError extends Error {
+  code: string;
+  recoverable: boolean;
+  cause?: Error;
+
   constructor(
     message: string,
-    public code: string,
-    public recoverable: boolean = false,
-    public cause?: Error
+    code: string,
+    recoverable: boolean = false,
+    cause?: Error
   ) {
     super(message);
     this.name = 'AIError';
+    this.code = code;
+    this.recoverable = recoverable;
+    this.cause = cause;
 
     // Maintains proper stack trace for where our error was thrown (only available on V8)
     if (Error.captureStackTrace) {

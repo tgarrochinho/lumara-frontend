@@ -34,3 +34,27 @@ export {
   createProvider,
   type RegisteredProvider,
 } from './registry';
+
+// Error handling
+export {
+  AIError,
+  ProviderUnavailableError,
+  ModelLoadError,
+  EmbeddingError,
+  NetworkError,
+  ChatError,
+  InitializationError,
+  DependencyError,
+  withRetry,
+  AIErrorHandler,
+  errorHandler,
+  type RetryOptions,
+} from './error-handler';
+
+// Health monitoring
+export {
+  HealthMonitor,
+  healthMonitor,
+  type HealthStatus,
+  type HealthMonitorOptions,
+} from './health-monitor';

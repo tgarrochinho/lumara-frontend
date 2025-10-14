@@ -4,7 +4,7 @@ status: backlog
 created: 2025-10-14T21:08:54Z
 progress: 0%
 prd: .claude/prds/core-user-journey.md
-github: null
+github: https://github.com/tgarrochinho/lumara-frontend/issues/30
 ---
 
 # Epic: Core User Journey

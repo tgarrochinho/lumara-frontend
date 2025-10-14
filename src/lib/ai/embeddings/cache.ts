@@ -2,7 +2,8 @@
  * Embedding cache management with memory and IndexedDB storage
  */
 
-import { openDB, DBSchema, IDBPDatabase } from 'idb';
+import { openDB } from 'idb';
+import type { DBSchema, IDBPDatabase } from 'idb';
 import type { EmbeddingCache, CacheStats, Embedding } from './types';
 
 /**
@@ -68,20 +69,6 @@ export class EmbeddingCacheManager {
     }
   }
 
-  /**
-   * Generate a cache key for the given text
-   * Uses a simple hash for now, could be upgraded to crypto.subtle.digest
-   */
-  private getCacheKey(text: string): string {
-    // Simple hash function for cache keys
-    let hash = 0;
-    for (let i = 0; i < text.length; i++) {
-      const char = text.charCodeAt(i);
-      hash = (hash << 5) - hash + char;
-      hash = hash & hash; // Convert to 32-bit integer
-    }
-    return `emb_${hash}`;
-  }
 
   /**
    * Store an embedding in both memory and persistent cache

@@ -6,13 +6,12 @@
 import { pipeline, env } from '@xenova/transformers';
 import { embeddingCache } from './cache';
 import { embeddingProgress } from '../utils/progress';
-import {
+import type {
   Embedding,
   EmbeddingOptions,
-  EmbeddingError,
-  EmbeddingErrorType,
   DownloadProgress,
 } from './types';
+import { EmbeddingError, EmbeddingErrorType } from './types';
 
 // Configure Transformers.js environment
 env.allowLocalModels = false; // Use CDN
@@ -28,7 +27,6 @@ class TransformersEmbeddingService {
   private embedder: any = null;
   private loading: boolean = false;
   private loadPromise: Promise<any> | null = null;
-  private retryCount: number = 0;
   private readonly maxRetries: number = 3;
   private readonly modelName: string = 'Xenova/all-MiniLM-L6-v2';
 
@@ -48,7 +46,6 @@ class TransformersEmbeddingService {
     try {
       this.embedder = await this.loadPromise;
       this.loading = false;
-      this.retryCount = 0;
       embeddingProgress.complete('Model loaded successfully');
     } catch (error) {
       this.loading = false;
@@ -255,7 +252,6 @@ class TransformersEmbeddingService {
     this.embedder = null;
     this.loadPromise = null;
     this.loading = false;
-    this.retryCount = 0;
   }
 
   /**

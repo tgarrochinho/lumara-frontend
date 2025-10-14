@@ -59,23 +59,30 @@ export interface CacheStats {
 /**
  * Error types for embedding operations
  */
-export enum EmbeddingErrorType {
-  MODEL_LOAD_FAILED = 'MODEL_LOAD_FAILED',
-  GENERATION_FAILED = 'GENERATION_FAILED',
-  CACHE_ERROR = 'CACHE_ERROR',
-  INVALID_INPUT = 'INVALID_INPUT',
-}
+export const EmbeddingErrorType = {
+  MODEL_LOAD_FAILED: 'MODEL_LOAD_FAILED',
+  GENERATION_FAILED: 'GENERATION_FAILED',
+  CACHE_ERROR: 'CACHE_ERROR',
+  INVALID_INPUT: 'INVALID_INPUT',
+} as const;
+
+export type EmbeddingErrorType = typeof EmbeddingErrorType[keyof typeof EmbeddingErrorType];
 
 /**
  * Custom error class for embedding operations
  */
 export class EmbeddingError extends Error {
+  public readonly type: EmbeddingErrorType;
+  public readonly originalError?: Error;
+
   constructor(
-    public type: EmbeddingErrorType,
+    type: EmbeddingErrorType,
     message: string,
-    public originalError?: Error
+    originalError?: Error
   ) {
     super(message);
     this.name = 'EmbeddingError';
+    this.type = type;
+    this.originalError = originalError;
   }
 }

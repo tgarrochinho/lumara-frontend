@@ -18,8 +18,15 @@ import { ProviderInitializationError } from '../types';
 declare global {
   interface Window {
     ai?: {
-      canCreateTextSession: () => Promise<AISessionAvailability>;
-      createTextSession: (options?: AISessionOptions) => Promise<AITextSession>;
+      // Legacy API (Chrome <141)
+      canCreateTextSession?: () => Promise<AISessionAvailability>;
+      createTextSession?: (options?: AISessionOptions) => Promise<AITextSession>;
+
+      // New API (Chrome 141+)
+      languageModel?: {
+        capabilities: () => Promise<AILanguageModelCapabilities>;
+        create: (options?: AILanguageModelOptions) => Promise<AILanguageModel>;
+      };
     };
   }
 }
@@ -33,6 +40,28 @@ interface AISessionOptions {
 
 interface AITextSession {
   prompt: (input: string) => Promise<string>;
+  promptStreaming?: (input: string) => AsyncIterable<string>;
+  destroy?: () => void;
+}
+
+// New API types (Chrome 141+)
+interface AILanguageModelCapabilities {
+  available: 'readily' | 'after-download' | 'no';
+  defaultTemperature?: number;
+  defaultTopK?: number;
+  maxTopK?: number;
+}
+
+interface AILanguageModelOptions {
+  temperature?: number;
+  topK?: number;
+  systemPrompt?: string;
+  initialPrompts?: Array<{ role: string; content: string }>;
+  language?: string; // Required in newer versions: 'en', 'es', 'ja'
+}
+
+interface AILanguageModel {
+  prompt: (input: string, options?: { language?: string }) => Promise<string>;
   promptStreaming?: (input: string) => AsyncIterable<string>;
   destroy?: () => void;
 }
@@ -61,8 +90,11 @@ export class ChromeAIProvider extends BaseProvider {
     multimodal: false,
   };
 
-  /** The active Chrome AI session */
-  private session: AITextSession | null = null;
+  /** The active Chrome AI session (legacy or new API) */
+  private session: AITextSession | AILanguageModel | null = null;
+
+  /** Track which API version we're using */
+  private usingNewAPI = false;
 
   /**
    * Initialize the Chrome AI provider
@@ -81,32 +113,77 @@ export class ChromeAIProvider extends BaseProvider {
         );
       }
 
-      // Check if the model is ready
-      const availability = await window.ai.canCreateTextSession();
+      // Try new API first (Chrome 141+)
+      if (window.ai.languageModel) {
+        console.log('[ChromeAI] Using new languageModel API (Chrome 141+)');
+        this.usingNewAPI = true;
 
-      if (availability === 'no') {
+        // Check capabilities
+        const capabilities = await window.ai.languageModel.capabilities();
+
+        if (capabilities.available === 'no') {
+          throw new Error(
+            'Chrome AI is not available on this device. Your device may not support on-device AI.'
+          );
+        }
+
+        if (capabilities.available === 'after-download') {
+          throw new Error(
+            'Chrome AI model needs to be downloaded. Please wait for the download to complete and try again.'
+          );
+        }
+
+        // Create language model session with language parameter
+        const modelOptions: AILanguageModelOptions = {
+          language: 'en', // Required in newer versions
+        };
+
+        if (config?.temperature !== undefined) {
+          modelOptions.temperature = config.temperature;
+        }
+
+        this.session = await window.ai.languageModel.create(modelOptions);
+        this.initialized = true;
+        this.config = config;
+
+        console.log(`${this.name} initialized successfully (new API)`);
+      }
+      // Fall back to legacy API (Chrome <141)
+      else if (window.ai.canCreateTextSession && window.ai.createTextSession) {
+        console.log('[ChromeAI] Using legacy API (Chrome <141)');
+        this.usingNewAPI = false;
+
+        // Check if the model is ready
+        const availability = await window.ai.canCreateTextSession();
+
+        if (availability === 'no') {
+          throw new Error(
+            'Chrome AI is not available on this device. Your device may not support on-device AI.'
+          );
+        }
+
+        if (availability === 'after-download') {
+          throw new Error(
+            'Chrome AI model needs to be downloaded. Please wait for the download to complete and try again.'
+          );
+        }
+
+        // Create a text session
+        const sessionOptions: AISessionOptions = {};
+        if (config?.temperature !== undefined) {
+          sessionOptions.temperature = config.temperature;
+        }
+
+        this.session = await window.ai.createTextSession(sessionOptions);
+        this.initialized = true;
+        this.config = config;
+
+        console.log(`${this.name} initialized successfully (legacy API)`);
+      } else {
         throw new Error(
-          'Chrome AI is not available on this device. Your device may not support on-device AI.'
+          'No compatible Chrome AI API found. Please update Chrome or enable flags.'
         );
       }
-
-      if (availability === 'after-download') {
-        throw new Error(
-          'Chrome AI model needs to be downloaded. Please wait for the download to complete and try again.'
-        );
-      }
-
-      // Create a text session
-      const sessionOptions: AISessionOptions = {};
-      if (config?.temperature !== undefined) {
-        sessionOptions.temperature = config.temperature;
-      }
-
-      this.session = await window.ai.createTextSession(sessionOptions);
-      this.initialized = true;
-      this.config = config;
-
-      console.log(`${this.name} initialized successfully`);
     } catch (error) {
       this.initialized = false;
       throw new ProviderInitializationError(this.name, error);
@@ -207,7 +284,11 @@ export class ChromeAIProvider extends BaseProvider {
       }
 
       // Get response from Chrome AI
-      const response = await this.session.prompt(prompt);
+      // New API (Chrome 141+) requires language parameter
+      const response = this.usingNewAPI
+        ? await (this.session as AILanguageModel).prompt(prompt, { language: 'en' })
+        : await this.session.prompt(prompt);
+
       return response;
     } catch (error) {
       throw new Error(

@@ -17,8 +17,8 @@ import { MockAIProvider } from './providers/mock-ai';
  * Each key corresponds to a ProviderType and maps to a provider class constructor.
  */
 export const providerRegistry = {
-  'mock-ai': MockAIProvider, // Development/testing provider (always works)
-  'chrome-ai': ChromeAIProvider,
+  'chrome-ai': ChromeAIProvider, // Try Chrome AI first
+  'mock-ai': MockAIProvider, // Fallback for development/testing (always works)
   // Future providers will be added here:
   // 'gemini': GeminiAPIProvider,
   // 'lm-studio': LMStudioProvider,

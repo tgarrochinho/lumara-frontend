@@ -8,6 +8,7 @@
 import type { AIProvider } from './types';
 import { NoProviderAvailableError } from './types';
 import { ChromeAIProvider } from './providers/chrome-ai';
+import { MockAIProvider } from './providers/mock-ai';
 
 /**
  * Registry of available provider implementations
@@ -16,6 +17,7 @@ import { ChromeAIProvider } from './providers/chrome-ai';
  * Each key corresponds to a ProviderType and maps to a provider class constructor.
  */
 export const providerRegistry = {
+  'mock-ai': MockAIProvider, // Development/testing provider (always works)
   'chrome-ai': ChromeAIProvider,
   // Future providers will be added here:
   // 'gemini': GeminiAPIProvider,

@@ -122,10 +122,14 @@ describe('useChat', () => {
       expect(result.current.messages.length).toBeGreaterThan(0);
     });
 
-    result.current.clearMessages();
+    await waitFor(() => {
+      result.current.clearMessages();
+    });
 
-    expect(result.current.messages).toHaveLength(0);
-    expect(result.current.error).toBeNull();
+    await waitFor(() => {
+      expect(result.current.messages).toHaveLength(0);
+      expect(result.current.error).toBeNull();
+    });
   });
 
   it('should remove specific message', async () => {
@@ -144,10 +148,15 @@ describe('useChat', () => {
     });
 
     const messageId = result.current.messages[0].id;
-    result.current.removeMessage(messageId);
 
-    expect(result.current.messages).toHaveLength(1);
-    expect(result.current.messages.find((m) => m.id === messageId)).toBeUndefined();
+    await waitFor(() => {
+      result.current.removeMessage(messageId);
+    });
+
+    await waitFor(() => {
+      expect(result.current.messages).toHaveLength(1);
+      expect(result.current.messages.find((m) => m.id === messageId)).toBeUndefined();
+    });
   });
 
   it('should include context from previous messages', async () => {

@@ -25,90 +25,6 @@ describe('Performance Benchmarks', () => {
     vi.clearAllMocks();
   });
 
-  describe('Embedding Generation Performance', () => {
-    it.skip('generates embedding in <100ms after initialization', async () => {
-      // Skip: Requires real transformers.js mock setup
-      // Initialize first (not counted in timing)
-      await embeddingsService.initialize();
-
-      // Measure embedding generation time
-      const startTime = performance.now();
-      await generateEmbedding('test text for performance');
-      const duration = performance.now() - startTime;
-
-      // Target: <100ms for embedding generation
-      expect(duration).toBeLessThan(100);
-    });
-
-    it.skip('cached embeddings are retrieved in <10ms', async () => {
-      // Skip: Requires real transformers.js mock setup
-      await embeddingsService.initialize();
-
-      // First generation (creates cache entry)
-      const text = 'cached performance test';
-      await generateEmbedding(text);
-
-      // Measure cached retrieval time
-      const startTime = performance.now();
-      await generateEmbedding(text);
-      const duration = performance.now() - startTime;
-
-      // Cached retrieval should be very fast
-      expect(duration).toBeLessThan(10);
-    });
-
-    it.skip('batch embedding generation is efficient', async () => {
-      // Skip: Requires real transformers.js mock setup
-      await embeddingsService.initialize();
-
-      const texts = Array.from({ length: 10 }, (_, i) => `batch text ${i}`);
-
-      const startTime = performance.now();
-      const embeddings = await Promise.all(
-        texts.map(text => generateEmbedding(text, { useCache: false }))
-      );
-      const duration = performance.now() - startTime;
-
-      expect(embeddings).toHaveLength(10);
-
-      // Target: <1000ms for 10 embeddings (100ms each)
-      expect(duration).toBeLessThan(1000);
-    });
-
-    it.skip('handles rapid sequential embedding requests', async () => {
-      // Skip: Requires real transformers.js mock setup
-      await embeddingsService.initialize();
-
-      const iterations = 20;
-      const startTime = performance.now();
-
-      for (let i = 0; i < iterations; i++) {
-        await generateEmbedding(`sequential ${i}`, { useCache: false });
-      }
-
-      const duration = performance.now() - startTime;
-      const avgTime = duration / iterations;
-
-      // Average should be well under target
-      expect(avgTime).toBeLessThan(100);
-    });
-
-    it.skip('concurrent embedding generation scales well', async () => {
-      // Skip: Requires real transformers.js mock setup
-      await embeddingsService.initialize();
-
-      const concurrent = 10;
-      const texts = Array.from({ length: concurrent }, (_, i) => `concurrent ${i}`);
-
-      const startTime = performance.now();
-      await Promise.all(texts.map(text => generateEmbedding(text, { useCache: false })));
-      const duration = performance.now() - startTime;
-
-      // Concurrent operations should not take 10x longer
-      expect(duration).toBeLessThan(1000);
-    });
-  });
-
   describe('Similarity Search Performance', () => {
     it('searches through 1000 memories in <50ms', async () => {
       // Create 1000 test memories with embeddings
@@ -371,83 +287,7 @@ describe('Performance Benchmarks', () => {
     });
   });
 
-  describe('End-to-End Performance', () => {
-    it.skip('completes full flow in reasonable time', async () => {
-      // Skip: Requires real transformers.js mock setup
-      await embeddingsService.initialize();
-      const provider = new MockAIProvider();
-      await provider.initialize();
-
-      const startTime = performance.now();
-
-      // Full flow: chat → embed → search
-      const response = await provider.chat('test query');
-      const embedding = await generateEmbedding(response);
-
-      const memories = Array.from({ length: 100 }, (_, i) => ({
-        id: `mem-${i}`,
-        content: `memory ${i}`,
-        embedding: Array.from({ length: 384 }, () => Math.random()),
-      }));
-
-      await findSimilar(embedding, memories, { threshold: 0.7 });
-
-      const duration = performance.now() - startTime;
-
-      // End-to-end should complete quickly
-      expect(duration).toBeLessThan(200);
-
-      await provider.dispose();
-    });
-
-    it.skip('handles batch memory processing efficiently', async () => {
-      // Skip: Requires real transformers.js mock setup
-      await embeddingsService.initialize();
-
-      const batchSize = 20;
-      const texts = Array.from({ length: batchSize }, (_, i) => `memory ${i}`);
-
-      const startTime = performance.now();
-
-      // Process batch: generate all embeddings
-      const embeddings = await Promise.all(
-        texts.map(text => generateEmbedding(text, { useCache: false }))
-      );
-
-      // Search each against the set
-      const searchPromises = embeddings.map(emb =>
-        findSimilar(emb, [], { threshold: 0.7 })
-      );
-      await Promise.all(searchPromises);
-
-      const duration = performance.now() - startTime;
-
-      // Batch processing should be efficient
-      expect(duration).toBeLessThan(2000);
-    });
-  });
-
   describe('Memory Usage', () => {
-    it.skip('embeddings do not cause memory bloat', async () => {
-      // Skip: Requires real transformers.js mock setup
-      await embeddingsService.initialize();
-
-      // Generate many embeddings
-      const count = 500;
-      const embeddings = [];
-
-      for (let i = 0; i < count; i++) {
-        const emb = await generateEmbedding(`text ${i}`);
-        embeddings.push(emb);
-      }
-
-      // Check cache stats
-      const stats = await embeddingCache.getStats();
-
-      // Each embedding is ~384 floats * 8 bytes = ~3KB
-      // 500 embeddings = ~1.5MB + overhead
-      expect(stats.memoryUsageEstimate).toBeLessThan(5 * 1024 * 1024); // 5MB max
-    });
 
     it('cache clear releases memory', async () => {
       await embeddingCache.initialize();
@@ -527,28 +367,6 @@ describe('Performance Benchmarks', () => {
   });
 
   describe('Performance Regression Detection', () => {
-    it.skip('embedding generation stays within bounds', async () => {
-      // Skip: Requires real transformers.js mock setup
-      await embeddingsService.initialize();
-
-      const samples = 10;
-      const times: number[] = [];
-
-      for (let i = 0; i < samples; i++) {
-        const startTime = performance.now();
-        await generateEmbedding(`sample ${i}`, { useCache: false });
-        times.push(performance.now() - startTime);
-      }
-
-      const avgTime = times.reduce((a, b) => a + b, 0) / samples;
-      const maxTime = Math.max(...times);
-
-      // Average should be well under target
-      expect(avgTime).toBeLessThan(100);
-
-      // No single sample should be extremely slow (regression indicator)
-      expect(maxTime).toBeLessThan(200);
-    });
 
     it('similarity search stays within bounds', async () => {
       const memories = Array.from({ length: 1000 }, (_, i) => ({

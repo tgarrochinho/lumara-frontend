@@ -21,33 +21,48 @@
 
 ---
 
-## 🚀 Next Wave: Understanding Evolution MVP
+## 🚀 Next Wave: Core User Journey
 
 ### Command to Start
 ```bash
-/pm:prd-new understanding-evolution "Track how user understanding evolves over time with visual timeline, confidence scoring, and practice tracking - the killer differentiator"
+/pm:prd-new core-user-journey "Basic memory capture, conversation interface, and viewing - the essential user experience"
 ```
 
 ### After PRD Created
 ```bash
 # 1. Parse PRD to Epic
-/pm:prd-parse understanding-evolution
+/pm:prd-parse core-user-journey
 
 # 2. Decompose Epic to Tasks
-/pm:epic-decompose understanding-evolution
+/pm:epic-decompose core-user-journey
 
 # 3. Sync to GitHub Issues
-/pm:github-sync understanding-evolution
+/pm:github-sync core-user-journey
 
 # 4. Start Parallel Execution
-/pm:epic-start understanding-evolution
+/pm:epic-start core-user-journey
 ```
 
 ---
 
 ## 📋 Future Waves (In Order)
 
-### Wave 2: Memory Architecture Foundation
+### Wave 2: Understanding Evolution MVP
+**Duration:** 2 weeks | **Priority:** CRITICAL
+
+```bash
+/pm:prd-new understanding-evolution "Track how user understanding evolves over time with visual timeline, confidence scoring, and practice tracking - the killer differentiator"
+```
+
+**Scope:** The unique feature that differentiates Lumara
+- Evolution timeline visualization
+- Interpretation tracking over time
+- Confidence scoring algorithm
+- Practice/testing tracking
+
+---
+
+### Wave 3: Memory Architecture Foundation
 **Duration:** 10 days | **Priority:** HIGH
 
 ```bash
@@ -61,7 +76,7 @@
 
 ---
 
-### Wave 3: Memory Mechanics & Polish
+### Wave 4: Memory Mechanics & Polish
 **Duration:** 10 days | **Priority:** HIGH
 
 ```bash
@@ -74,7 +89,7 @@
 
 ---
 
-### Wave 4: Core Product Features
+### Wave 5: Core Product Features
 **Duration:** 3 weeks | **Priority:** MEDIUM
 
 ```bash
@@ -82,35 +97,35 @@
 ```
 
 **Sub-Waves (Can Execute Separately):**
-- 4.1: Living Playbooks (Week 1)
-- 4.2: Thinking Coach (Week 2)
-- 4.3: Pattern Discovery (Week 3)
+- 5.1: Living Playbooks (Week 1)
+- 5.2: Thinking Coach (Week 2)
+- 5.3: Pattern Discovery (Week 3)
 
 ---
 
-### Wave 5: Contradiction Resolution UI
+### Wave 6: Contradiction Resolution UI
 **Duration:** 1 week | **Priority:** HIGH
 
 ```bash
 /pm:prd-new contradiction-ui "User-friendly contradiction resolution interface with side-by-side comparison and resolution options"
 ```
 
-**Dependencies:** Wave 1 (Evolution MVP)
+**Dependencies:** Wave 2 (Evolution MVP), Wave 3 (Memory Foundation)
 
 ---
 
-### Wave 6: Duplication Detection & Prevention
+### Wave 7: Duplication Detection & Prevention
 **Duration:** 3 days | **Priority:** MEDIUM
 
 ```bash
 /pm:prd-new duplication-prevention "Prevent duplicate memory creation with pre-check alerts and merge suggestions"
 ```
 
-**Can run parallel with:** Wave 5
+**Can run parallel with:** Wave 6
 
 ---
 
-### Wave 7: Multi-Provider Support
+### Wave 8: Multi-Provider Support
 **Duration:** 2 weeks | **Priority:** MEDIUM
 
 ```bash
@@ -158,26 +173,34 @@ For any new wave:
 |------|--------|----------|----------|--------------|
 | 0.1 Bootstrap | ✅ Done | 3 days | - | None |
 | 0.2 AI Foundation | ✅ Done | 1 week | - | Wave 0.1 |
-| **1 Evolution MVP** | **🎯 Next** | **2 weeks** | **CRITICAL** | Wave 0.2 |
-| 2 Memory Foundation | 📋 Planned | 10 days | HIGH | Wave 1 |
-| 3 Memory Mechanics | 📋 Planned | 10 days | HIGH | Wave 2 |
-| 4 Core Features | 📋 Planned | 3 weeks | MEDIUM | Wave 2 |
-| 5 Contradiction UI | 📋 Planned | 1 week | HIGH | Wave 1, 2 |
-| 6 Duplication | 📋 Planned | 3 days | MEDIUM | Wave 2 |
-| 7 Multi-Provider | 📋 Future | 2 weeks | MEDIUM | Wave 0.2 |
+| **1 Core User Journey** | **🎯 Next** | **1 week** | **CRITICAL** | Wave 0.2 |
+| 2 Evolution MVP | 📋 Planned | 2 weeks | CRITICAL | Wave 1 |
+| 3 Memory Foundation | 📋 Planned | 10 days | HIGH | Wave 2 |
+| 4 Memory Mechanics | 📋 Planned | 10 days | HIGH | Wave 3 |
+| 5 Core Features | 📋 Planned | 3 weeks | MEDIUM | Wave 3 |
+| 6 Contradiction UI | 📋 Planned | 1 week | HIGH | Wave 2, 3 |
+| 7 Duplication | 📋 Planned | 3 days | MEDIUM | Wave 3 |
+| 8 Multi-Provider | 📋 Future | 2 weeks | MEDIUM | Wave 0.2 |
 
 ---
 
 ## 🎯 Why Wave 1 First?
 
-**Understanding Evolution MVP is the killer feature:**
-- ✨ **Unique:** Nobody else tracks understanding evolution
-- 🎨 **Demostrable:** 60-second "aha moment" demo
-- 📈 **Validates:** Core value proposition
-- 🔑 **Differentiates:** From ChatGPT, Supermemory, Notion AI
-- ⚡ **Foundation Ready:** All AI capabilities in place
+**Core User Journey is the essential foundation:**
+- 🎯 **Essential:** Users must be able to CREATE memories before we can track evolution
+- 🚀 **Quick Win:** Get basic functionality working in 1 week
+- 🔧 **Foundation:** All future features depend on memory creation and viewing
+- 💡 **User Testing:** Can validate UI/UX with real users immediately
+- ⚡ **Momentum:** Ship working features fast
 
-**User reaction goal:** "This isn't just notes - it's my intellectual journey."
+**User reaction goal:** "I can capture and organize my thoughts easily."
+
+**Then Wave 2 delivers the killer feature:**
+- ✨ **Unique:** Understanding Evolution tracking (nobody else has this)
+- 🎨 **Demonstrable:** 60-second "aha moment" demo
+- 📈 **Differentiates:** From ChatGPT, Supermemory, Notion AI
+
+**Strategy:** Foundation first → differentiation second
 
 ---
 

@@ -42,15 +42,66 @@ Lumara's development follows a wave-based approach, where each wave delivers a c
 
 ## 🚀 Upcoming Waves
 
-### Wave 1: Understanding Evolution MVP (THE KILLER FEATURE)
+### Wave 1: Core User Journey (THE FOUNDATION)
 **Status:** 🎯 Next Up
+**Priority:** CRITICAL - Users must be able to USE the product
+**Duration:** 1 week
+**Source:** `docs/ONBOARDING_COLD_START_STRATEGY.md` + `docs/UI_UX_SPECIFICATIONS.md`
+**PRD:** `/pm:prd-new core-user-journey "Basic memory capture, conversation interface, and viewing - the essential user experience"`
+
+#### Why First?
+Users need to be able to CREATE and VIEW memories before we can track evolution. This is the minimum viable experience that lets users start using Lumara.
+
+#### Features
+1. **Memory Capture Flow**
+   - Conversational memory creation
+   - Text input with AI assistance
+   - Memory type selection (knowledge/experience/method)
+   - Save to Dexie database
+
+2. **Conversation Interface**
+   - Chat UI with AI responses (using our Chrome AI provider)
+   - Context-aware suggestions
+   - Memory extraction from conversation
+   - Real-time AI interaction
+
+3. **Memory Viewing & Browsing**
+   - List view of all memories
+   - Filter by type
+   - Search functionality
+   - Memory cards with metadata
+   - Edit/delete operations
+
+4. **Basic Contradiction Detection UI**
+   - Inline contradiction alerts
+   - "Similar memory exists" warnings
+   - Simple resolution options
+   - Uses existing detection from Wave 0.2
+
+#### Technical Approach
+- Build on existing AI foundation (Wave 0.2)
+- Use existing Dexie schema (Memory table ready)
+- Create core UI components
+- Integrate Chrome AI chat for conversation
+- Wire up contradiction detection (backend ready, need UI)
+
+#### Success Metrics
+- User can create first memory in <2 minutes
+- User can browse/search memories
+- User sees contradiction alert on conflict
+- Flow feels natural and intuitive
+
+---
+
+### Wave 2: Understanding Evolution MVP (THE KILLER FEATURE)
+**Status:** 📋 Planned (after Wave 1)
 **Priority:** CRITICAL - Product differentiator
 **Duration:** 2 weeks
 **Source:** `docs/UNDERSTANDING_EVOLUTION_MVP.md`
 **PRD:** `/pm:prd-new understanding-evolution "Track how user understanding evolves over time - the killer differentiator"`
 
-#### Why First?
-This is what nobody else has. ChatGPT can't do this. Supermemory can't do this. This is Lumara's unique value proposition.
+#### Why Second (Not First)?
+Now users have memories to EVOLVE. They've created knowledge, resolved contradictions, and have data to visualize. Evolution tracking makes sense because there's evolution to track.
 
 #### Features
 1. **Evolution Timeline Visualization**
@@ -92,7 +143,7 @@ This is what nobody else has. ChatGPT can't do this. Supermemory can't do this. 
 
 ---
 
-### Wave 2: Memory Architecture Foundation
+### Wave 3: Memory Architecture Foundation
 **Status:** 📋 Planned
 **Priority:** HIGH - Core transformation
 **Duration:** 10 days (Phase 0-2 of 20-day plan)
@@ -129,7 +180,7 @@ This gives us a working memory-based data model and basic UI. Wave 3 adds the ad
 
 ---
 
-### Wave 3: Memory Mechanics & Polish
+### Wave 4: Memory Mechanics & Polish
 **Status:** 📋 Planned
 **Priority:** HIGH - Complete memory system
 **Duration:** 10 days (Phase 3-4 of 20-day plan)
@@ -155,7 +206,7 @@ This gives us a working memory-based data model and basic UI. Wave 3 adds the ad
 
 ---
 
-### Wave 4: Core Product Features
+### Wave 5: Core Product Features
 **Status:** 📋 Planned
 **Priority:** MEDIUM - Value-add features
 **Duration:** 3 weeks
@@ -164,7 +215,7 @@ This gives us a working memory-based data model and basic UI. Wave 3 adds the ad
 
 #### Features
 
-**4.1: Living Playbooks (Week 1)**
+**5.1: Living Playbooks (Week 1)**
 - Auto-generate from high-confidence knowledge (>80%)
 - Group by topic/domain
 - Show confidence per recommendation
@@ -173,7 +224,7 @@ This gives us a working memory-based data model and basic UI. Wave 3 adds the ad
 - Auto-update with new evidence
 - Decay warnings for old sections
 
-**4.2: Thinking Coach (Week 2)**
+**5.2: Thinking Coach (Week 2)**
 - Detect confirmation bias (ignoring contradictions)
 - Warn about overconfidence (high confidence, low testing)
 - Identify stagnation (beliefs unchanged for months)
@@ -181,7 +232,7 @@ This gives us a working memory-based data model and basic UI. Wave 3 adds the ad
 - Highlight avoidance patterns
 - Provide gentle nudges
 
-**4.3: Pattern Discovery (Week 3)**
+**5.3: Pattern Discovery (Week 3)**
 - Temporal pattern detection
 - Causal relationship identification
 - Suggest connections between memories
@@ -191,7 +242,7 @@ This gives us a working memory-based data model and basic UI. Wave 3 adds the ad
 
 ---
 
-### Wave 5: Contradiction Resolution UI
+### Wave 6: Contradiction Resolution UI
 **Status:** 📋 Planned
 **Priority:** HIGH - Must-have for MVP
 **Duration:** 1 week
@@ -218,7 +269,7 @@ This gives us a working memory-based data model and basic UI. Wave 3 adds the ad
 
 ---
 
-### Wave 6: Duplication Detection & Prevention
+### Wave 7: Duplication Detection & Prevention
 **Status:** 📋 Planned
 **Priority:** MEDIUM - Quality of life
 **Duration:** 3 days
@@ -235,7 +286,7 @@ This gives us a working memory-based data model and basic UI. Wave 3 adds the ad
 
 ---
 
-### Wave 7: Multi-Provider Support
+### Wave 8: Multi-Provider Support
 **Status:** 📋 Future
 **Priority:** MEDIUM - Expand compatibility
 **Duration:** 2 weeks
@@ -289,54 +340,61 @@ Each wave can be executed using CCPM commands:
 Wave 0.1 (Bootstrap) ──┐
                        ├─→ Wave 0.2 (AI Foundation) ──┐
                        │                              │
-                       │                              ├─→ Wave 1 (Evolution MVP) ──┐
-                       │                              │                            │
-                       └──────────────────────────────┘                            │
-                                                                                    │
-Wave 2 (Memory Foundation) ◄────────────────────────────────────────────────────┘
+                       │                              ├─→ Wave 1 (Core User Journey) ──┐
+                       │                              │                                 │
+                       └──────────────────────────────┘                                 │
+                                                                                         │
+                                                                                         ├─→ Wave 2 (Evolution MVP) ──┐
+                                                                                         │                            │
+                                                                                         └────────────────────────────┘
+                                                                                                                      │
+Wave 3 (Memory Foundation) ◄──────────────────────────────────────────────────────────────────────────────────────┘
          │
-         ├─→ Wave 3 (Memory Mechanics) ──┐
+         ├─→ Wave 4 (Memory Mechanics) ──┐
          │                               │
-         ├─→ Wave 5 (Contradiction UI) ──┤
-         │                               ├─→ Wave 4 (Core Features)
-         └─→ Wave 6 (Duplication)  ──────┘
+         ├─→ Wave 6 (Contradiction UI) ──┤
+         │                               ├─→ Wave 5 (Core Features)
+         └─→ Wave 7 (Duplication)  ──────┘
 ```
 
 ### Parallel Execution Opportunities
 
 **Can Run in Parallel:**
-- Wave 5 (Contradiction UI) + Wave 6 (Duplication) - Different systems
-- Wave 4.1, 4.2, 4.3 - Independent features
+- Wave 6 (Contradiction UI) + Wave 7 (Duplication) - Different systems
+- Wave 5.1, 5.2, 5.3 - Independent features
 
 **Must Run Sequentially:**
-- Wave 1 before Wave 2 - Evolution needs to be understood first
-- Wave 2 before Wave 3 - Foundation before mechanics
-- Wave 0.2 before Wave 7 - Provider abstraction must exist
+- Wave 1 before Wave 2 - User journey before evolution tracking
+- Wave 2 before Wave 3 - Evolution features before memory foundation
+- Wave 3 before Wave 4 - Foundation before mechanics
+- Wave 0.2 before Wave 8 - Provider abstraction must exist
 
 ---
 
 ## 🎯 Immediate Next Steps
 
-### Wave 1: Understanding Evolution MVP
+### Wave 1: Core User Journey
 
 **Ready to start:** ✅ All dependencies met
 
 **Create PRD:**
 ```bash
-/pm:prd-new understanding-evolution "Track how user understanding evolves over time with visual timeline, confidence scoring, and practice tracking - the killer differentiator that nobody else has"
+/pm:prd-new core-user-journey "Basic memory capture, conversation interface, and viewing - the essential user experience"
 ```
 
 **Expected Timeline:**
-- Week 1: Data model + Evolution capture
-- Week 2: Timeline UI + Confidence algorithm
-- Total: 10 working days
-- Outcome: Demoed in 60 seconds, user "aha moments"
+- Days 1-2: Memory capture flow
+- Days 3-4: Conversation interface
+- Days 5-6: Memory viewing & browsing
+- Day 7: Basic contradiction detection UI
+- Total: 1 week
+- Outcome: Users can create and view memories
 
 **Success Criteria:**
-1. Users can see 3+ evolution points on timeline
-2. Confidence scores update based on testing
-3. "This tracks MY journey" moment
-4. Feature differentiates from all competitors
+1. User can create first memory in <2 minutes
+2. User can browse/search memories
+3. User sees contradiction alert on conflict
+4. Flow feels natural and intuitive
 
 ---
 
@@ -367,14 +425,20 @@ Wave 2 (Memory Foundation) ◄────────────────�
 ## 🔍 Wave Selection Criteria
 
 **Priority Matrix:**
-1. **Product Differentiation** - Features nobody else has
-2. **User Value** - Immediate benefit to users
+1. **User Value** - Immediate benefit to users
+2. **Product Differentiation** - Features nobody else has
 3. **Technical Foundation** - Enables future features
 4. **Risk Reduction** - Validate assumptions early
 
-**Wave 1 Scores Highest:**
-- ⭐⭐⭐⭐⭐ Product Differentiation - Unique to Lumara
+**Wave 1 (Core User Journey) - The Foundation:**
+- ⭐⭐⭐⭐⭐ User Value - Essential functionality
+- ⭐⭐⭐ Product Differentiation - Standard but necessary
+- ⭐⭐⭐⭐⭐ Technical Foundation - Enables all other features
+- ⭐⭐⭐⭐⭐ Risk Reduction - Users must be able to USE the product
+
+**Wave 2 (Understanding Evolution) - The Differentiator:**
 - ⭐⭐⭐⭐⭐ User Value - "Aha moment" feature
+- ⭐⭐⭐⭐⭐ Product Differentiation - Unique to Lumara
 - ⭐⭐⭐⭐ Technical Foundation - Uses AI foundation
 - ⭐⭐⭐⭐⭐ Risk Reduction - Validates core value prop
 

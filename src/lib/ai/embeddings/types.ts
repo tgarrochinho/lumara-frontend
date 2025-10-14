@@ -44,6 +44,11 @@ export interface EmbeddingOptions {
    * Pooling strategy for the model (default: 'mean')
    */
   pooling?: 'mean' | 'cls' | 'max';
+
+  /**
+   * Batch size for processing multiple embeddings (default: 10)
+   */
+  batchSize?: number;
 }
 
 /**

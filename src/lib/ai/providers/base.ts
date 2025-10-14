@@ -5,6 +5,7 @@
  * Concrete providers extend this class and implement the abstract methods.
  */
 
+import { performanceMonitor } from '../performance';
 import type {
   AIProvider,
   AICapabilities,
@@ -89,13 +90,33 @@ export abstract class BaseProvider implements AIProvider {
   // Abstract methods that concrete providers must implement
 
   /**
-   * Chat with the AI provider
+   * Chat with the AI provider (abstract)
+   *
+   * Concrete implementations should wrap this with performance monitoring.
    *
    * @param message - The user's message
    * @param context - Optional context from previous conversations
    * @returns The AI's response
    */
   abstract chat(message: string, context?: string[]): Promise<string>;
+
+  /**
+   * Helper to wrap chat with performance monitoring
+   *
+   * @param fn - The chat function to wrap
+   * @param message - The user's message
+   * @param context - Optional context
+   * @returns The AI's response
+   */
+  protected async measureChat(
+    fn: (message: string, context?: string[]) => Promise<string>,
+    message: string,
+    context?: string[]
+  ): Promise<string> {
+    return performanceMonitor.measure(`${this.name}-chat`, () =>
+      fn(message, context)
+    );
+  }
 
   /**
    * Generate embeddings for text

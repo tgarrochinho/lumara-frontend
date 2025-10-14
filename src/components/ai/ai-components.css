@@ -1,0 +1,540 @@
+/**
+ * AI Components Styles
+ *
+ * Responsive, accessible styles for AI setup, status, and loading components.
+ * Follows system color scheme preferences and supports dark mode.
+ */
+
+/* ==========================================================================
+   Common styles
+   ========================================================================== */
+
+.ai-loading-state,
+.ai-error-state,
+.ai-setup-success,
+.ai-setup-degraded,
+.ai-setup-uninitialized {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  max-width: 500px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+/* ==========================================================================
+   AILoadingState
+   ========================================================================== */
+
+.ai-loading-state {
+  gap: 1rem;
+}
+
+.loading-spinner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.5rem;
+}
+
+.spinner-svg {
+  animation: spin 1s linear infinite;
+  color: #6366f1;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spinner-circle {
+  stroke-dasharray: 50;
+  stroke-dashoffset: 25;
+  animation: spinner-dash 1.5s ease-in-out infinite;
+}
+
+@keyframes spinner-dash {
+  0% {
+    stroke-dasharray: 1, 150;
+    stroke-dashoffset: 0;
+  }
+  50% {
+    stroke-dasharray: 90, 150;
+    stroke-dashoffset: -35;
+  }
+  100% {
+    stroke-dasharray: 90, 150;
+    stroke-dashoffset: -124;
+  }
+}
+
+.loading-title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: currentColor;
+}
+
+.loading-message {
+  margin: 0.5rem 0;
+  font-size: 1rem;
+  color: currentColor;
+  opacity: 0.8;
+}
+
+.progress-bar {
+  width: 100%;
+  max-width: 400px;
+  height: 8px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 1rem 0;
+}
+
+@media (prefers-color-scheme: light) {
+  .progress-bar {
+    background-color: rgba(0, 0, 0, 0.1);
+  }
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #6366f1, #8b5cf6);
+  transition: width 0.3s ease-out;
+  border-radius: 4px;
+}
+
+.progress-text {
+  margin: 0.5rem 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #6366f1;
+}
+
+.status-message {
+  margin: 0.5rem 0;
+  font-size: 0.875rem;
+  color: currentColor;
+  opacity: 0.7;
+}
+
+.privacy-note {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  padding: 0.75rem 1rem;
+  background-color: rgba(99, 102, 241, 0.1);
+  border-radius: 8px;
+  font-size: 0.875rem;
+  color: #6366f1;
+}
+
+@media (prefers-color-scheme: light) {
+  .privacy-note {
+    background-color: rgba(99, 102, 241, 0.1);
+    color: #4f46e5;
+  }
+}
+
+.privacy-icon {
+  flex-shrink: 0;
+}
+
+/* ==========================================================================
+   AIErrorState
+   ========================================================================== */
+
+.ai-error-state {
+  gap: 1rem;
+}
+
+.error-icon {
+  color: #ef4444;
+  margin-bottom: 0.5rem;
+}
+
+.error-title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: currentColor;
+}
+
+.error-message {
+  margin: 0.5rem 0;
+  font-size: 1rem;
+  color: currentColor;
+  opacity: 0.9;
+  line-height: 1.6;
+}
+
+.help-section {
+  margin: 1rem 0;
+  padding: 1rem;
+  background-color: rgba(239, 68, 68, 0.1);
+  border-radius: 8px;
+  border-left: 4px solid #ef4444;
+  text-align: left;
+  width: 100%;
+  max-width: 400px;
+}
+
+.help-title {
+  margin: 0 0 0.5rem 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #ef4444;
+}
+
+.help-text {
+  margin: 0.5rem 0;
+  font-size: 0.875rem;
+  color: currentColor;
+  opacity: 0.9;
+  line-height: 1.5;
+}
+
+.help-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  color: #ef4444;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.875rem;
+  transition: opacity 0.2s;
+}
+
+.help-link:hover {
+  opacity: 0.8;
+}
+
+.help-link:focus {
+  outline: 2px solid #ef4444;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.external-link-icon {
+  flex-shrink: 0;
+}
+
+.retry-button,
+.init-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  margin-top: 1rem;
+  background-color: #6366f1;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.retry-button:hover,
+.init-button:hover {
+  background-color: #4f46e5;
+}
+
+.retry-button:active,
+.init-button:active {
+  transform: scale(0.98);
+}
+
+.retry-button:focus,
+.init-button:focus {
+  outline: 2px solid #6366f1;
+  outline-offset: 2px;
+}
+
+.retry-icon {
+  flex-shrink: 0;
+}
+
+.technical-details {
+  margin-top: 1.5rem;
+  width: 100%;
+  max-width: 500px;
+  text-align: left;
+}
+
+.details-summary {
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: currentColor;
+  opacity: 0.7;
+  user-select: none;
+  padding: 0.5rem;
+  border-radius: 4px;
+  transition: opacity 0.2s;
+}
+
+.details-summary:hover {
+  opacity: 1;
+}
+
+.details-summary:focus {
+  outline: 2px solid #6366f1;
+  outline-offset: 2px;
+}
+
+.details-content {
+  margin-top: 0.5rem;
+}
+
+.details-pre {
+  padding: 1rem;
+  background-color: rgba(239, 68, 68, 0.1);
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-family: 'Courier New', monospace;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: currentColor;
+  opacity: 0.9;
+}
+
+/* ==========================================================================
+   AISetup Success
+   ========================================================================== */
+
+.ai-setup-success {
+  gap: 1rem;
+}
+
+.success-icon {
+  color: #10b981;
+  margin-bottom: 0.5rem;
+}
+
+.success-title {
+  margin: 0;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: currentColor;
+}
+
+.success-message {
+  margin: 0.5rem 0 1.5rem 0;
+  font-size: 1rem;
+  color: currentColor;
+  opacity: 0.8;
+}
+
+.feature-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 100%;
+  max-width: 400px;
+  margin-top: 1rem;
+}
+
+.feature-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background-color: rgba(16, 185, 129, 0.1);
+  border-radius: 8px;
+  font-size: 0.875rem;
+  color: currentColor;
+}
+
+.feature-icon {
+  flex-shrink: 0;
+  color: #10b981;
+}
+
+/* ==========================================================================
+   AISetup Degraded
+   ========================================================================== */
+
+.ai-setup-degraded {
+  gap: 1rem;
+}
+
+.warning-icon {
+  color: #f59e0b;
+  margin-bottom: 0.5rem;
+}
+
+.degraded-title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: currentColor;
+}
+
+.degraded-message {
+  margin: 0.5rem 0;
+  font-size: 1rem;
+  color: currentColor;
+  opacity: 0.8;
+}
+
+/* ==========================================================================
+   AIStatus Indicator
+   ========================================================================== */
+
+.ai-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.ai-status:focus {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+.ai-status-compact {
+  padding: 0.375rem;
+}
+
+.status-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.status-spinner {
+  animation: spin 1s linear infinite;
+}
+
+.status-text {
+  white-space: nowrap;
+}
+
+.provider-name {
+  opacity: 0.7;
+  font-size: 0.75rem;
+  margin-left: 0.25rem;
+}
+
+/* Status color variants */
+.ai-status-gray {
+  background-color: rgba(107, 114, 128, 0.1);
+  color: #6b7280;
+}
+
+.ai-status-blue {
+  background-color: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+}
+
+.ai-status-green {
+  background-color: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+}
+
+.ai-status-red {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+}
+
+.ai-status-yellow {
+  background-color: rgba(245, 158, 11, 0.1);
+  color: #f59e0b;
+}
+
+/* ==========================================================================
+   Responsive Design
+   ========================================================================== */
+
+@media (max-width: 640px) {
+  .ai-loading-state,
+  .ai-error-state,
+  .ai-setup-success,
+  .ai-setup-degraded,
+  .ai-setup-uninitialized {
+    padding: 1.5rem 1rem;
+  }
+
+  .loading-title,
+  .error-title,
+  .success-title,
+  .degraded-title {
+    font-size: 1.25rem;
+  }
+
+  .progress-bar {
+    max-width: 100%;
+  }
+
+  .help-section {
+    max-width: 100%;
+  }
+
+  .feature-list {
+    max-width: 100%;
+  }
+
+  .technical-details {
+    max-width: 100%;
+  }
+}
+
+/* ==========================================================================
+   Accessibility
+   ========================================================================== */
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  .spinner-svg,
+  .status-spinner,
+  .spinner-circle {
+    animation: none;
+  }
+
+  .progress-fill,
+  .retry-button,
+  .init-button,
+  .help-link,
+  .details-summary,
+  .ai-status {
+    transition: none;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .progress-bar {
+    border: 1px solid currentColor;
+  }
+
+  .help-section {
+    border: 2px solid #ef4444;
+  }
+
+  .ai-status {
+    border: 1px solid currentColor;
+  }
+}
+
+/* Focus visible for keyboard navigation */
+*:focus-visible {
+  outline: 2px solid #6366f1;
+  outline-offset: 2px;
+}

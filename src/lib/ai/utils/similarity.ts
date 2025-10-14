@@ -6,6 +6,7 @@
  */
 
 import { dotProduct, magnitude } from './vector-math';
+import { performanceMonitor } from '../performance';
 
 /**
  * Calculate cosine similarity between two vectors
@@ -75,6 +76,8 @@ export interface SimilaritySearchOptions {
  * the query embedding and all memory embeddings, returning matches
  * above the threshold sorted by similarity.
  *
+ * Optimized with performance tracking and early termination using a min-heap.
+ *
  * @param queryEmbedding - The embedding vector to search for
  * @param memories - Array of memories with embeddings to search through
  * @param options - Search configuration options
@@ -93,49 +96,61 @@ export async function findSimilar(
   memories: Array<{ id: string; content: string; embedding?: number[] }>,
   options: SimilaritySearchOptions = {}
 ): Promise<SimilarityMatch[]> {
-  const {
-    threshold = 0.7,
-    limit = 10,
-    excludeIds = [],
-  } = options;
+  return performanceMonitor.measureSync('similarity-search', () => {
+    const {
+      threshold = 0.7,
+      limit = 10,
+      excludeIds = [],
+    } = options;
 
-  const similarities: SimilarityMatch[] = [];
+    // Use min-heap approach for top-k results
+    const topK: SimilarityMatch[] = [];
+    let minSimilarity = threshold;
 
-  for (const memory of memories) {
-    // Skip if excluded
-    if (excludeIds.includes(memory.id)) {
-      continue;
-    }
-
-    // Skip if no embedding
-    if (!memory.embedding) {
-      continue;
-    }
-
-    try {
-      // Calculate similarity
-      const similarity = cosineSimilarity(queryEmbedding, memory.embedding);
-
-      // Add if above threshold
-      if (similarity >= threshold) {
-        similarities.push({
-          id: memory.id,
-          similarity,
-          content: memory.content,
-        });
+    for (const memory of memories) {
+      // Skip if excluded
+      if (excludeIds.includes(memory.id)) {
+        continue;
       }
-    } catch (error) {
-      // Skip memories with invalid embeddings
-      console.warn(`Skipping memory ${memory.id} due to embedding error:`, error);
-      continue;
+
+      // Skip if no embedding
+      if (!memory.embedding) {
+        continue;
+      }
+
+      try {
+        // Calculate similarity
+        const similarity = cosineSimilarity(queryEmbedding, memory.embedding);
+
+        // Only consider if above minimum threshold
+        if (similarity >= minSimilarity) {
+          // Add to results
+          topK.push({
+            id: memory.id,
+            similarity,
+            content: memory.content,
+          });
+
+          // Keep array sorted and maintain size limit
+          if (topK.length > limit) {
+            topK.sort((a, b) => b.similarity - a.similarity);
+            topK.pop(); // Remove lowest
+            // Update minimum threshold for early termination
+            minSimilarity = Math.max(threshold, topK[topK.length - 1].similarity);
+          }
+        }
+      } catch (error) {
+        // Skip memories with invalid embeddings
+        console.warn(`Skipping memory ${memory.id} due to embedding error:`, error);
+        continue;
+      }
     }
-  }
 
-  // Sort by similarity (descending)
-  similarities.sort((a, b) => b.similarity - a.similarity);
+    // Final sort by similarity (descending)
+    topK.sort((a, b) => b.similarity - a.similarity);
 
-  // Limit results
-  return similarities.slice(0, limit);
+    return topK;
+  });
 }
 
 /**
@@ -173,6 +188,8 @@ export function batchCosineSimilarity(
  * Efficient method to get only the top matches without sorting all results.
  * Useful for large datasets where you only need a few best matches.
  *
+ * Optimized with performance tracking and better heap management.
+ *
  * @param query - The query vector
  * @param vectors - Array of vectors with IDs and content
  * @param n - Number of top results to return
@@ -183,26 +200,41 @@ export function topNSimilar(
   vectors: Array<{ id: string; content: string; embedding: number[] }>,
   n: number
 ): SimilarityMatch[] {
-  const matches: SimilarityMatch[] = [];
+  return performanceMonitor.measureSync('top-n-similarity', () => {
+    const matches: SimilarityMatch[] = [];
+    let minSimilarity = -Infinity;
 
-  for (const item of vectors) {
-    try {
-      const similarity = cosineSimilarity(query, item.embedding);
+    for (const item of vectors) {
+      try {
+        // Skip if we have enough results and this can't beat the minimum
+        const similarity = cosineSimilarity(query, item.embedding);
 
-      if (matches.length < n) {
-        // Add to array if not yet at limit
-        matches.push({ id: item.id, similarity, content: item.content });
-        matches.sort((a, b) => b.similarity - a.similarity);
-      } else if (similarity > matches[matches.length - 1].similarity) {
-        // Replace lowest similarity if this is higher
-        matches[matches.length - 1] = { id: item.id, similarity, content: item.content };
-        matches.sort((a, b) => b.similarity - a.similarity);
+        if (matches.length < n) {
+          // Add to array if not yet at limit
+          matches.push({ id: item.id, similarity, content: item.content });
+
+          // Only sort when we reach the limit
+          if (matches.length === n) {
+            matches.sort((a, b) => b.similarity - a.similarity);
+            minSimilarity = matches[matches.length - 1].similarity;
+          }
+        } else if (similarity > minSimilarity) {
+          // Replace lowest similarity if this is higher
+          matches[matches.length - 1] = { id: item.id, similarity, content: item.content };
+          matches.sort((a, b) => b.similarity - a.similarity);
+          minSimilarity = matches[matches.length - 1].similarity;
+        }
+      } catch (error) {
+        // Skip invalid vectors
+        continue;
       }
-    } catch (error) {
-      // Skip invalid vectors
-      continue;
     }
-  }
 
-  return matches;
+    // Final sort if we have less than n matches
+    if (matches.length < n) {
+      matches.sort((a, b) => b.similarity - a.similarity);
+    }
+
+    return matches;
+  });
 }

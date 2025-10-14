@@ -6,6 +6,8 @@
 import { pipeline, env } from '@xenova/transformers';
 import { embeddingCache } from './cache';
 import { embeddingProgress } from '../utils/progress';
+import { performanceMonitor } from '../performance';
+import { ModelCacheManager } from '../cache-strategy';
 import type {
   Embedding,
   EmbeddingOptions,
@@ -19,6 +21,19 @@ env.allowRemoteModels = true;
 
 // Set cache directory for models
 env.cacheDir = 'models';
+
+// Enable Cache API for model persistence if available
+if (ModelCacheManager.isSupported()) {
+  // Transformers.js will use IndexedDB by default, but we can add
+  // additional Cache API layer for cross-session persistence
+  console.log('Cache API available for model persistence');
+}
+
+/**
+ * In-memory memoization for embeddings currently being generated
+ * Prevents duplicate requests for the same text
+ */
+const embeddingMemo = new Map<string, Promise<Embedding>>();
 
 /**
  * Service for generating semantic embeddings using Transformers.js
@@ -151,23 +166,16 @@ class TransformersEmbeddingService {
     }
 
     try {
-      const startTime = performance.now();
+      // Use performance monitoring
+      return await performanceMonitor.measure('embedding-generation', async () => {
+        const output = await this.embedder(text, {
+          pooling: options.pooling || 'mean',
+          normalize: options.normalize !== false, // Default to true
+        });
 
-      const output = await this.embedder(text, {
-        pooling: options.pooling || 'mean',
-        normalize: options.normalize !== false, // Default to true
+        const embedding: Embedding = Array.from(output.data);
+        return embedding;
       });
-
-      const embedding: Embedding = Array.from(output.data);
-
-      const duration = performance.now() - startTime;
-      if (duration > 100) {
-        console.warn(
-          `Embedding generation took ${duration.toFixed(1)}ms (target: <100ms)`
-        );
-      }
-
-      return embedding;
     } catch (error) {
       throw new EmbeddingError(
         EmbeddingErrorType.GENERATION_FAILED,
@@ -199,21 +207,25 @@ class TransformersEmbeddingService {
       await this.initialize();
     }
 
-    const startTime = performance.now();
+    // Use performance monitoring for batch operations
+    return await performanceMonitor.measure('batch-embedding-generation', async () => {
+      const batchSize = options.batchSize || 10;
+      const embeddings: Embedding[] = [];
 
-    // Process in parallel
-    const embeddings = await Promise.all(
-      texts.map((text) => this.generateEmbedding(text, options))
-    );
+      // Process in smaller batches to avoid memory issues
+      for (let i = 0; i < texts.length; i += batchSize) {
+        const batch = texts.slice(i, i + batchSize);
 
-    const duration = performance.now() - startTime;
-    const avgTime = duration / texts.length;
+        // Process batch in parallel
+        const batchResults = await Promise.all(
+          batch.map((text) => this.generateEmbedding(text, options))
+        );
 
-    console.log(
-      `Generated ${texts.length} embeddings in ${duration.toFixed(1)}ms (avg: ${avgTime.toFixed(1)}ms per embedding)`
-    );
+        embeddings.push(...batchResults);
+      }
 
-    return embeddings;
+      return embeddings;
+    });
   }
 
   /**
@@ -265,6 +277,36 @@ class TransformersEmbeddingService {
       isLoading: this.isLoading(),
     };
   }
+
+  /**
+   * Get cache information for model persistence
+   */
+  async getCacheInfo() {
+    if (!ModelCacheManager.isSupported()) {
+      return {
+        supported: false,
+        size: 0,
+        itemCount: 0,
+      };
+    }
+
+    const info = await ModelCacheManager.getCacheInfo();
+    return {
+      supported: true,
+      size: info.size,
+      itemCount: info.itemCount,
+      urls: info.urls,
+    };
+  }
+
+  /**
+   * Clear model cache
+   */
+  async clearModelCache() {
+    if (ModelCacheManager.isSupported()) {
+      await ModelCacheManager.clearCache();
+    }
+  }
 }
 
 /**
@@ -273,7 +315,7 @@ class TransformersEmbeddingService {
 export const embeddingsService = new TransformersEmbeddingService();
 
 /**
- * Generate an embedding with caching support
+ * Generate an embedding with caching support and memoization
  * @param text The text to embed
  * @param options Options for embedding generation
  * @returns 384-dimensional embedding vector
@@ -284,26 +326,46 @@ export async function generateEmbedding(
 ): Promise<Embedding> {
   const useCache = options.useCache !== false; // Default to true
 
-  // Initialize cache if needed
-  if (useCache) {
-    await embeddingCache.initialize();
+  // Check in-flight memoization first
+  if (useCache && embeddingMemo.has(text)) {
+    return embeddingMemo.get(text)!;
+  }
 
-    // Check cache first
-    const cached = await embeddingCache.get(text);
-    if (cached) {
-      return cached;
+  // Create promise for this embedding
+  const promise = (async () => {
+    // Initialize cache if needed
+    if (useCache) {
+      await embeddingCache.initialize();
+
+      // Check persistent cache
+      const cached = await embeddingCache.get(text);
+      if (cached) {
+        return cached;
+      }
     }
-  }
 
-  // Generate new embedding
-  const embedding = await embeddingsService.generateEmbedding(text, options);
+    // Generate new embedding with performance tracking
+    const embedding = await embeddingsService.generateEmbedding(text, options);
 
-  // Cache result
+    // Cache result
+    if (useCache) {
+      await embeddingCache.set(text, embedding);
+    }
+
+    return embedding;
+  })();
+
+  // Memoize promise to prevent duplicate requests
   if (useCache) {
-    await embeddingCache.set(text, embedding);
+    embeddingMemo.set(text, promise);
   }
 
-  return embedding;
+  try {
+    return await promise;
+  } finally {
+    // Clean up memoization after completion
+    embeddingMemo.delete(text);
+  }
 }
 
 /**

@@ -76,6 +76,21 @@ export class MockAIProvider extends BaseProvider {
   private embedDelay = 0;
 
   /**
+   * Semantic groups for generating similar embeddings for related concepts
+   * This makes tests more realistic by ensuring related words have similar embeddings
+   */
+  private semanticGroups = [
+    ['coffee', 'beverage', 'drink', 'caffeine', 'espresso', 'latte'],
+    ['tea', 'beverage', 'drink', 'herbal', 'green tea', 'chai'],
+    ['morning', 'breakfast', 'wake', 'dawn', 'early'],
+    ['night', 'evening', 'sleep', 'bedtime', 'late'],
+    ['work', 'job', 'career', 'office', 'business', 'professional'],
+    ['home', 'house', 'residence', 'living', 'apartment'],
+    ['technology', 'tech', 'computer', 'software', 'digital'],
+    ['food', 'meal', 'eat', 'cuisine', 'dish', 'cooking'],
+  ];
+
+  /**
    * Configure a custom chat response for a specific prompt
    *
    * @param prompt - The prompt to match (exact match)
@@ -241,34 +256,70 @@ export class MockAIProvider extends BaseProvider {
   }
 
   /**
-   * Generate a deterministic embedding based on text content
+   * Simple hash function for consistent deterministic values
    *
-   * Uses a simple hash function to create consistent embeddings for testing.
-   * Same text will always produce the same embedding.
-   *
-   * @param text - The text to generate embedding for
-   * @returns 384-dimensional normalized vector
+   * @param text - The text to hash
+   * @returns A hash number
    */
-  private generateDeterministicEmbedding(text: string): number[] {
-    const embedding = new Array(384);
-
-    // Simple hash function for deterministic values
+  private hashString(text: string): number {
     let hash = 0;
     for (let i = 0; i < text.length; i++) {
       hash = ((hash << 5) - hash) + text.charCodeAt(i);
       hash = hash & hash; // Convert to 32-bit integer
     }
+    return Math.abs(hash);
+  }
 
-    // Use hash as seed for pseudo-random number generator
-    let seed = Math.abs(hash);
+  /**
+   * Generate a deterministic embedding with semantic awareness
+   *
+   * Creates embeddings where semantically similar texts (based on semantic groups)
+   * have higher cosine similarity. This makes tests more realistic.
+   *
+   * @param text - The text to generate embedding for
+   * @returns 384-dimensional normalized vector
+   */
+  private generateDeterministicEmbedding(text: string): number[] {
+    const embedding = new Array(384).fill(0);
+    const lowerText = text.toLowerCase();
+
+    // Find which semantic groups this text belongs to
+    const matchedGroups: number[] = [];
+    this.semanticGroups.forEach((group, groupIndex) => {
+      if (group.some(keyword => lowerText.includes(keyword))) {
+        matchedGroups.push(groupIndex);
+      }
+    });
+
+    // Base hash for text-specific variation
+    const baseHash = this.hashString(text);
+    let seed = baseHash;
     const random = () => {
       seed = (seed * 9301 + 49297) % 233280;
       return seed / 233280;
     };
 
-    // Generate embedding values
+    // Generate base embedding with reduced weight (for uniqueness)
     for (let i = 0; i < 384; i++) {
-      embedding[i] = random() * 2 - 1; // Range: -1 to 1
+      embedding[i] = (random() * 2 - 1) * 0.3; // Range: -0.3 to 0.3 (reduced weight)
+    }
+
+    // Add semantic components for matched groups
+    // This ensures texts in the same semantic group have similar embeddings
+    if (matchedGroups.length > 0) {
+      matchedGroups.forEach(groupIndex => {
+        // Use group index as seed for consistent group representation
+        let groupSeed = groupIndex * 12345;
+        const groupRandom = () => {
+          groupSeed = (groupSeed * 9301 + 49297) % 233280;
+          return groupSeed / 233280;
+        };
+
+        // Add group-specific components (heavily weighted to ensure high similarity)
+        for (let i = 0; i < 384; i++) {
+          embedding[i] += (groupRandom() * 2 - 1) * 3.0; // Weight: 3.0 (much stronger)
+        }
+      });
     }
 
     // Normalize the vector (make magnitude = 1)

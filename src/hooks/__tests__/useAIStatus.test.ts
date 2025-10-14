@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { renderHook, waitFor } from '@testing-library/react';
+import { renderHook, waitFor, act } from '@testing-library/react';
 import { useAIStatus } from '../useAIStatus';
 import * as registry from '@/lib/ai/registry';
 import * as transformers from '@/lib/ai/embeddings/transformers';
@@ -11,7 +11,32 @@ import * as transformers from '@/lib/ai/embeddings/transformers';
 // Mock modules
 vi.mock('@/lib/ai/registry');
 vi.mock('@/lib/ai/embeddings/transformers');
-vi.mock('@/lib/ai/health-monitor');
+vi.mock('@/lib/ai/health-monitor', () => ({
+  HealthMonitor: class MockHealthMonitor {
+    private status: any = {
+      status: 'healthy',
+      available: true,
+      message: 'All systems operational',
+      lastChecked: new Date(),
+    };
+
+    startMonitoring() {
+      // No-op for tests
+    }
+
+    stopMonitoring() {
+      // No-op for tests
+    }
+
+    getStatus() {
+      return this.status;
+    }
+
+    setStatus(newStatus: any) {
+      this.status = newStatus;
+    }
+  },
+}));
 
 describe('useAIStatus', () => {
   const mockProvider = {
@@ -55,10 +80,13 @@ describe('useAIStatus', () => {
     });
 
     // Mock embeddings initialization with progress callback
+    // Add small delays to allow progress polling to work
     mockEmbeddingsService.initialize.mockImplementation(async (onProgress?: (prog: number) => void) => {
       if (onProgress) {
         onProgress(0);
+        await new Promise(resolve => setTimeout(resolve, 20));
         onProgress(50);
+        await new Promise(resolve => setTimeout(resolve, 20));
         onProgress(100);
       }
     });
@@ -143,9 +171,13 @@ describe('useAIStatus', () => {
       await initPromise;
       clearInterval(interval);
 
+      // Wait for final progress update to propagate
+      await waitFor(() => {
+        expect(result.current.progress).toBe(100);
+      });
+
       // Should have seen multiple progress updates
       expect(progressValues.length).toBeGreaterThan(0);
-      expect(result.current.progress).toBe(100);
     });
 
     it('should update progress messages', async () => {
@@ -278,14 +310,23 @@ describe('useAIStatus', () => {
 
       expect(result.current.isLoading).toBe(false);
 
-      const initPromise = result.current.initialize();
-
-      await waitFor(() => {
-        expect(result.current.isLoading).toBe(true);
+      // Start initialization in act() and check isLoading synchronously
+      let initPromise: Promise<void>;
+      act(() => {
+        initPromise = result.current.initialize();
       });
 
-      await initPromise;
+      // isLoading should be true now (checked after act() microtask)
+      await waitFor(() => {
+        expect(result.current.isLoading).toBe(true);
+      }, { timeout: 200 });
 
+      // Wait for initialization to complete
+      await act(async () => {
+        await initPromise!;
+      });
+
+      // isLoading should be false again
       expect(result.current.isLoading).toBe(false);
     });
   });

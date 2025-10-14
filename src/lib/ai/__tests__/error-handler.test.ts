@@ -207,9 +207,8 @@ describe('withRetry', () => {
 
     const promise = withRetry(fn, { maxAttempts: 3, delayMs: 100 });
 
-    // Advance through all retries
-    await vi.advanceTimersByTimeAsync(100);
-    await vi.advanceTimersByTimeAsync(200);
+    // Run all timers to completion (advances through all retries)
+    await vi.runAllTimersAsync();
 
     await expect(promise).rejects.toThrow(error);
     expect(fn).toHaveBeenCalledTimes(3);

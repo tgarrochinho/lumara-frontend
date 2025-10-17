@@ -104,10 +104,10 @@ export function MemoryExtraction({
         <div className="flex items-start justify-between">
           <div>
             <h3 className="text-lg font-semibold text-gray-900">
-              Save as Memory
+              Review Memory
             </h3>
             <p className="text-sm text-gray-600">
-              Review and edit before saving
+              I noticed something worth remembering — want to save it?
             </p>
           </div>
 

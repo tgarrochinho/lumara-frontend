@@ -5,7 +5,7 @@
  * Supports Enter to send, Shift+Enter for new lines.
  */
 
-import { useState, KeyboardEvent, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, type KeyboardEvent } from 'react';
 
 interface InputFieldProps {
   onSend: (content: string) => void | Promise<void>;

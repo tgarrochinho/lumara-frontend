@@ -17,7 +17,7 @@ import { ProviderInitializationError } from '../types';
  */
 declare global {
   // Latest API (Chrome 141+) - Global LanguageModel
-  const LanguageModel: {
+  var LanguageModel: {
     availability: () => Promise<'readily' | 'after-download' | 'no'>;
     params: () => Promise<{
       defaultTemperature: number;
@@ -77,6 +77,7 @@ interface AILanguageModelCreateOptions {
   topK?: number;
   systemPrompt?: string;
   initialPrompts?: Array<{ role: string; content: string }>;
+  language?: string; // Output language code: 'en', 'es', 'ja'
 }
 
 interface AILanguageModel {
@@ -105,15 +106,16 @@ export class ChromeAIProvider extends BaseProvider {
   capabilities: AICapabilities = {
     chat: true,
     embeddings: false, // Embeddings handled by Transformers.js (Task #26)
-    streaming: false, // Could be implemented in future
+    streaming: true, // Now supported via promptStreaming
     multimodal: false,
   };
 
-  /** The active Chrome AI session (legacy or new API) */
+  /** The active Chrome AI session (Chrome 141+ API) */
   private session: AITextSession | AILanguageModel | null = null;
 
-  /** Track which API version we're using */
-  private usingNewAPI = false;
+  /** Download progress callback (reserved for future use when Chrome exposes progress events) */
+  // @ts-expect-error - Reserved for future API support
+  private downloadProgressCallback?: (loaded: number, total: number) => void;
 
   /**
    * Initialize the Chrome AI provider
@@ -125,112 +127,57 @@ export class ChromeAIProvider extends BaseProvider {
    */
   async initialize(config?: ProviderConfig): Promise<void> {
     try {
-      // Try latest API first (Chrome 141+) - Global LanguageModel
-      if (typeof LanguageModel !== 'undefined') {
-        console.log('[ChromeAI] Using latest global LanguageModel API (Chrome 141+)');
-        this.usingNewAPI = true;
-
-        // Check availability
-        const availability = await LanguageModel.availability();
-
-        if (availability === 'no') {
-          throw new Error(
-            'Chrome AI is not available on this device. Your device may not support on-device AI.'
-          );
-        }
-
-        if (availability === 'after-download') {
-          throw new Error(
-            'Chrome AI model needs to be downloaded. Please wait for the download to complete and try again.'
-          );
-        }
-
-        // Create language model session
-        const modelOptions: AILanguageModelCreateOptions = {};
-
-        if (config?.temperature !== undefined) {
-          modelOptions.temperature = config.temperature;
-        }
-
-        this.session = await LanguageModel.create(modelOptions);
-        this.initialized = true;
-        this.config = config;
-
-        console.log(`${this.name} initialized successfully (latest global API)`);
-        return;
-      }
-
-      // Try transitional API (Chrome 128-140)
-      if (window.ai?.languageModel) {
-        console.log('[ChromeAI] Using new languageModel API (Chrome 141+)');
-        this.usingNewAPI = true;
-
-        // Check capabilities
-        const capabilities = await window.ai.languageModel.capabilities();
-
-        if (capabilities.available === 'no') {
-          throw new Error(
-            'Chrome AI is not available on this device. Your device may not support on-device AI.'
-          );
-        }
-
-        if (capabilities.available === 'after-download') {
-          throw new Error(
-            'Chrome AI model needs to be downloaded. Please wait for the download to complete and try again.'
-          );
-        }
-
-        // Create language model session with language parameter
-        const modelOptions: AILanguageModelOptions = {
-          language: 'en', // Required in newer versions
-        };
-
-        if (config?.temperature !== undefined) {
-          modelOptions.temperature = config.temperature;
-        }
-
-        this.session = await window.ai.languageModel.create(modelOptions);
-        this.initialized = true;
-        this.config = config;
-
-        console.log(`${this.name} initialized successfully (new API)`);
-      }
-      // Fall back to legacy API (Chrome <141)
-      else if (window.ai.canCreateTextSession && window.ai.createTextSession) {
-        console.log('[ChromeAI] Using legacy API (Chrome <141)');
-        this.usingNewAPI = false;
-
-        // Check if the model is ready
-        const availability = await window.ai.canCreateTextSession();
-
-        if (availability === 'no') {
-          throw new Error(
-            'Chrome AI is not available on this device. Your device may not support on-device AI.'
-          );
-        }
-
-        if (availability === 'after-download') {
-          throw new Error(
-            'Chrome AI model needs to be downloaded. Please wait for the download to complete and try again.'
-          );
-        }
-
-        // Create a text session
-        const sessionOptions: AISessionOptions = {};
-        if (config?.temperature !== undefined) {
-          sessionOptions.temperature = config.temperature;
-        }
-
-        this.session = await window.ai.createTextSession(sessionOptions);
-        this.initialized = true;
-        this.config = config;
-
-        console.log(`${this.name} initialized successfully (legacy API)`);
-      } else {
+      // Check for secure context (HTTPS required)
+      if (typeof window !== 'undefined' && !window.isSecureContext) {
         throw new Error(
-          'No compatible Chrome AI API found. Please update Chrome or enable flags.'
+          'Chrome AI requires a secure context (HTTPS). Please access this page over HTTPS.'
         );
       }
+
+      // Only use Chrome 141+ global LanguageModel API
+      if (typeof globalThis.LanguageModel === 'undefined' || !globalThis.LanguageModel) {
+        throw new Error(
+          'Chrome AI global LanguageModel API not found. ' +
+          'This app requires Chrome 141+ with the latest Gemini Nano API. ' +
+          'Please update Chrome and enable chrome://flags/#prompt-api-for-gemini-nano'
+        );
+      }
+
+      // Check availability
+      const availability = await globalThis.LanguageModel.availability();
+
+      if (availability === 'no') {
+        throw new Error(
+          'Chrome AI is not available on this device. Your device may not support on-device AI.'
+        );
+      }
+
+      if (availability === 'after-download') {
+        throw new Error(
+          'Chrome AI model needs to be downloaded. Please wait for the download to complete and try again.'
+        );
+      }
+
+      // Create language model session
+      const modelOptions: AILanguageModelCreateOptions = {
+        // Always specify output language (required for optimal quality)
+        language: 'en', // Default to English
+      };
+
+      // Chrome AI requires both topK and temperature, or neither
+      if (config?.temperature !== undefined && config?.topK !== undefined) {
+        modelOptions.temperature = config.temperature;
+        modelOptions.topK = config.topK;
+      }
+
+      // Add system prompt if provided (supported in Chrome 141+)
+      if ((config as any)?.systemPrompt) {
+        modelOptions.systemPrompt = (config as any).systemPrompt;
+      }
+
+      this.session = await globalThis.LanguageModel.create(modelOptions);
+      this.initialized = true;
+      this.config = config;
     } catch (error) {
       this.initialized = false;
       throw new ProviderInitializationError(this.name, error);
@@ -241,26 +188,37 @@ export class ChromeAIProvider extends BaseProvider {
    * Enhanced health check for Chrome AI
    *
    * Checks both initialization status and API availability.
+   * Only supports Chrome 141+ global LanguageModel API.
    *
    * @returns Current health status
    */
   async healthCheck(): Promise<ProviderHealth> {
     const now = new Date();
 
-    // Check if API is available
-    if (!window.ai) {
+    // Check for secure context
+    if (typeof window !== 'undefined' && !window.isSecureContext) {
       return {
         available: false,
         status: 'unavailable',
-        message: 'Chrome AI API not available. Use Chrome Canary/Dev with Origin Trial.',
+        message: 'Chrome AI requires HTTPS (secure context).',
         lastChecked: now,
       };
     }
 
-    // Check model availability
     try {
-      const availability = await window.ai.canCreateTextSession();
+      // Only check Chrome 141+ global API
+      if (typeof globalThis.LanguageModel === 'undefined' || !globalThis.LanguageModel) {
+        return {
+          available: false,
+          status: 'unavailable',
+          message: 'Chrome AI global LanguageModel API not found. Requires Chrome 141+.',
+          lastChecked: now,
+        };
+      }
 
+      const availability = await globalThis.LanguageModel.availability();
+
+      // Check availability status
       if (availability === 'no') {
         return {
           available: false,
@@ -292,7 +250,7 @@ export class ChromeAIProvider extends BaseProvider {
       return {
         available: true,
         status: 'ready',
-        message: 'Chrome AI is ready',
+        message: 'Chrome AI is ready (Chrome 141+)',
         lastChecked: now,
       };
     } catch (error) {
@@ -343,6 +301,51 @@ export class ChromeAIProvider extends BaseProvider {
   }
 
   /**
+   * Chat with Chrome AI using streaming
+   *
+   * Streams the response token by token for better UX.
+   *
+   * @param message - The user's message
+   * @param context - Optional context to include in the prompt
+   * @returns AsyncIterable that yields response chunks
+   * @throws Error if not initialized or if streaming is not supported
+   */
+  async *chatStream(message: string, context?: string[]): AsyncIterable<string> {
+    // Ensure we're initialized
+    if (!this.initialized || !this.session) {
+      await this.initialize(this.config);
+    }
+
+    if (!this.session) {
+      throw new Error('Failed to create Chrome AI session');
+    }
+
+    // Check if streaming is supported
+    if (!this.session.promptStreaming) {
+      throw new Error('Streaming is not supported by this Chrome AI API version');
+    }
+
+    try {
+      // Build the prompt with optional context
+      let prompt = message;
+      if (context && context.length > 0) {
+        prompt = `Context:\n${context.join('\n\n')}\n\nUser: ${message}`;
+      }
+
+      // Stream response from Chrome AI
+      const stream = this.session.promptStreaming(prompt);
+
+      for await (const chunk of stream) {
+        yield chunk;
+      }
+    } catch (error) {
+      throw new Error(
+        `Chrome AI streaming chat failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
+    }
+  }
+
+  /**
    * Generate embeddings - NOT SUPPORTED
    *
    * Chrome AI does not support embeddings generation.
@@ -357,6 +360,50 @@ export class ChromeAIProvider extends BaseProvider {
   }
 
   /**
+   * Set a callback to monitor model download progress
+   *
+   * Note: Chrome AI doesn't expose direct download progress.
+   * This is a placeholder for future API support.
+   *
+   * @param callback - Function called with (loaded, total) bytes
+   */
+  setDownloadProgressCallback(callback: (loaded: number, total: number) => void): void {
+    this.downloadProgressCallback = callback;
+  }
+
+  /**
+   * Trigger model download if needed
+   *
+   * Attempts to download the Chrome AI model if it's not available.
+   * This will throw if the model status is 'no' (not supported).
+   * Only supports Chrome 141+ global LanguageModel API.
+   *
+   * @returns Status after attempting download
+   */
+  async downloadModel(): Promise<'readily' | 'after-download' | 'no'> {
+    try {
+      // Only use Chrome 141+ global API
+      if (typeof globalThis.LanguageModel === 'undefined' || !globalThis.LanguageModel) {
+        throw new Error('Chrome AI global LanguageModel API not found. Requires Chrome 141+.');
+      }
+
+      const availability = await globalThis.LanguageModel.availability();
+
+      if (availability === 'after-download') {
+        // Creating a session triggers the download
+        const session = await globalThis.LanguageModel.create();
+        session.destroy?.();
+        return 'readily';
+      }
+
+      return availability;
+    } catch (error) {
+      console.error('[ChromeAI] Download model failed:', error);
+      throw error;
+    }
+  }
+
+  /**
    * Clean up the Chrome AI session
    *
    * Destroys the active session and resets state.
@@ -368,7 +415,6 @@ export class ChromeAIProvider extends BaseProvider {
     this.session = null;
     this.initialized = false;
     this.config = undefined;
-
-    console.log(`${this.name} disposed`);
+    this.downloadProgressCallback = undefined;
   }
 }

@@ -10,7 +10,7 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { generateEmbedding, embeddingsService } from '../embeddings/transformers';
+import { embeddingsService } from '../embeddings/transformers';
 import { findSimilar, cosineSimilarity, batchCosineSimilarity } from '../utils/similarity';
 import { MockAIProvider } from '../providers/mock';
 import { embeddingCache } from '../embeddings/cache';

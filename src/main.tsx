@@ -6,9 +6,6 @@ import { queryClient } from '@/lib/query'
 import './styles/globals.css'
 import App from './App.tsx'
 
-// Debug Chrome AI setup in development
-import './lib/ai/chrome-ai-debug'
-
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>

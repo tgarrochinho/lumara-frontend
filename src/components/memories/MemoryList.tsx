@@ -1,50 +1,74 @@
 /**
  * Memory List Component
  *
- * Displays all saved memories in reverse chronological order.
- * Uses Dexie live queries for automatic reactivity.
+ * Displays all saved memories with search and filtering capabilities.
+ * Uses semantic search and type filters.
  */
 
-import { useLiveQuery } from 'dexie-react-hooks';
-import { db } from '../../lib/db';
+import { useMemorySearch } from '../../hooks/useMemorySearch';
 import { MemoryCard } from './MemoryCard';
+import { MemoryFilters } from './MemoryFilters';
 import { EmptyState } from '../layout/EmptyState';
 
 /**
- * Memory list container
+ * Memory list container with filters
  *
- * Displays memories with automatic updates via Dexie live queries.
- * Shows empty state when no memories exist.
+ * Displays memories with search and type filtering.
+ * Automatically updates when memories change.
  */
 export function MemoryList() {
-  // Dexie live query - auto re-renders on DB changes
-  const memories = useLiveQuery(
-    () => db.memories.orderBy('createdAt').reverse().toArray()
-  );
+  const {
+    memories,
+    isSearching,
+    searchQuery,
+    filterType,
+    setSearchQuery,
+    setFilterType,
+    clearFilters,
+  } = useMemorySearch();
 
-  // Loading state
-  if (!memories) {
-    return (
-      <div className="flex items-center justify-center h-full">
-        <div className="text-gray-500">Loading memories...</div>
-      </div>
-    );
-  }
-
-  // Empty state
-  if (memories.length === 0) {
-    return <EmptyState />;
-  }
+  const hasActiveFilters = searchQuery.trim() !== '' || filterType !== 'all';
 
   return (
-    <div
-      className="p-4 space-y-4 overflow-y-auto"
-      data-testid="memory-list"
-    >
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {memories.map(memory => (
-          <MemoryCard key={memory.id} memory={memory} />
-        ))}
+    <div className="h-full flex flex-col">
+      {/* Filters Section */}
+      <div className="p-4 border-b border-gray-200 bg-white">
+        <MemoryFilters
+          searchQuery={searchQuery}
+          filterType={filterType}
+          onSearchChange={setSearchQuery}
+          onFilterChange={setFilterType}
+          onClearFilters={clearFilters}
+          memoryCount={memories.length}
+          isSearching={isSearching}
+        />
+      </div>
+
+      {/* Memory List */}
+      <div className="flex-1 overflow-y-auto">
+        {memories.length === 0 ? (
+          <div className="flex items-center justify-center h-full p-4">
+            {hasActiveFilters ? (
+              <div className="text-center text-gray-500">
+                <p className="text-lg mb-2">No memories found</p>
+                <p className="text-sm">Try adjusting your filters or search query</p>
+              </div>
+            ) : (
+              <EmptyState />
+            )}
+          </div>
+        ) : (
+          <div
+            className="p-4 space-y-4"
+            data-testid="memory-list"
+          >
+            <div className="grid grid-cols-1 gap-4">
+              {memories.map(memory => (
+                <MemoryCard key={memory.id} memory={memory} />
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

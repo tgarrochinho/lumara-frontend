@@ -29,7 +29,6 @@ export class MockAIProvider implements AIProvider {
 
   async initialize(_config?: ProviderConfig): Promise<void> {
     // Mock provider is always ready
-    console.log('[MockAI] Provider initialized');
   }
 
   async dispose(): Promise<void> {
@@ -39,19 +38,18 @@ export class MockAIProvider implements AIProvider {
   async healthCheck(): Promise<ProviderHealth> {
     return {
       available: true,
-      latency: 50,
-      lastCheck: new Date(),
+      status: 'ready',
+      lastChecked: new Date(),
     };
   }
 
-  async chat(message: string, _context?: string[]): Promise<string> {
+  async chat(_message: string, _context?: string[]): Promise<string> {
     // Simulate network delay
     await new Promise(resolve => setTimeout(resolve, 500 + Math.random() * 500));
 
     // Return a random canned response
     const response = this.responses[Math.floor(Math.random() * this.responses.length)];
 
-    console.log('[MockAI] Responding to:', message.slice(0, 50));
     return response;
   }
 

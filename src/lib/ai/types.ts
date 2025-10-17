@@ -32,6 +32,14 @@ export interface AIProvider {
   chat(message: string, context?: string[]): Promise<string>;
 
   /**
+   * Stream chat responses from the AI provider (optional, only if streaming is supported)
+   * @param message - The user's message
+   * @param context - Optional context from previous conversations or relevant memories
+   * @returns Async iterable that yields response chunks as they arrive
+   */
+  chatStream?(message: string, context?: string[]): AsyncIterable<string>;
+
+  /**
    * Generate embeddings for text
    * @param text - The text to embed
    * @returns Vector representation of the text
@@ -90,6 +98,9 @@ export interface ProviderConfig {
   /** Maximum number of tokens to generate */
   maxTokens?: number;
 
+  /** Top-K sampling parameter for Chrome AI */
+  topK?: number;
+
   /** Additional provider-specific options */
   [key: string]: unknown;
 }
@@ -114,7 +125,7 @@ export interface ProviderHealth {
 /**
  * Type for provider registry keys
  */
-export type ProviderType = 'chrome-ai' | 'gemini' | 'lm-studio' | 'openai' | 'claude';
+export type ProviderType = 'gemini' | 'chrome-ai' | 'lm-studio' | 'openai' | 'claude' | 'mock-ai';
 
 /**
  * Error thrown when no AI provider is available

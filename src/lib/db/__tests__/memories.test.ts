@@ -101,7 +101,7 @@ describe('Memory CRUD Operations', () => {
       });
 
       const original = await getMemory(id);
-      const originalEmbedding = original!.embedding;
+      expect(original!.embedding).toBeDefined();
 
       await updateMemory(id, { content: 'Completely different' });
 

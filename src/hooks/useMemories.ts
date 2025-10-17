@@ -17,7 +17,7 @@ import {
 } from '../lib/db/memories';
 
 export interface UseMemoriesOptions {
-  filter?: MemoryType;
+  filter?: MemoryType | 'all';
   searchQuery?: string;
 }
 

@@ -114,7 +114,7 @@ describe('useConversation hook', () => {
         .mockResolvedValueOnce('First response')
         .mockResolvedValueOnce('Second response'),
     };
-    const selectProviderSpy = vi.spyOn(registry, 'selectProvider').mockResolvedValue(mockProvider as AIProvider);
+    vi.spyOn(registry, 'selectProvider').mockResolvedValue(mockProvider as AIProvider);
 
     const { result } = renderHook(() => useConversation());
 

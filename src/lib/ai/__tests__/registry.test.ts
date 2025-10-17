@@ -14,18 +14,18 @@ import { ChromeAIProvider } from '../providers/chrome-ai';
 import { NoProviderAvailableError } from '../types';
 
 // Mock Chrome AI API
-interface MockAI {
-  canCreateTextSession: ReturnType<typeof vi.fn>;
-  createTextSession: ReturnType<typeof vi.fn>;
-}
-
 interface MockTextSession {
   prompt: ReturnType<typeof vi.fn>;
   destroy?: ReturnType<typeof vi.fn>;
 }
 
+interface MockLanguageModel {
+  availability: ReturnType<typeof vi.fn>;
+  create: ReturnType<typeof vi.fn>;
+}
+
 describe('Provider Registry', () => {
-  let mockAI: MockAI;
+  let mockLanguageModel: MockLanguageModel;
   let mockSession: MockTextSession;
 
   beforeEach(() => {
@@ -35,34 +35,34 @@ describe('Provider Registry', () => {
       destroy: vi.fn(),
     };
 
-    // Create mock AI API
-    mockAI = {
-      canCreateTextSession: vi.fn(),
-      createTextSession: vi.fn(),
+    // Setup Chrome 141+ global LanguageModel API
+    mockLanguageModel = {
+      availability: vi.fn().mockResolvedValue('readily'),
+      create: vi.fn().mockResolvedValue(mockSession),
     };
 
-    // Setup default successful behavior
-    mockAI.canCreateTextSession.mockResolvedValue('readily');
-    mockAI.createTextSession.mockResolvedValue(mockSession);
     mockSession.prompt.mockResolvedValue('Mock response');
 
-    // Install mock in window
-    (window as Window & { ai?: MockAI }).ai = mockAI;
+    // Install mock global API
+    (globalThis as any).LanguageModel = mockLanguageModel;
+    (window as Window & { isSecureContext: boolean }).isSecureContext = true;
   });
 
   afterEach(() => {
     // Cleanup
-    delete (window as Window & { ai?: MockAI }).ai;
+    delete (globalThis as any).LanguageModel;
   });
 
   describe('providerRegistry', () => {
-    it('should contain chrome-ai provider', () => {
+    it('should contain chrome-ai and mock-ai providers', () => {
       expect(providerRegistry['chrome-ai']).toBe(ChromeAIProvider);
+      expect(providerRegistry['mock-ai']).toBeDefined();
     });
 
     it('should have const type definition', () => {
       // Registry is defined with 'as const' making it read-only at compile time
       expect(Object.keys(providerRegistry)).toContain('chrome-ai');
+      expect(Object.keys(providerRegistry)).toContain('mock-ai');
     });
   });
 
@@ -72,8 +72,8 @@ describe('Provider Registry', () => {
 
       expect(provider).toBeInstanceOf(ChromeAIProvider);
       expect(provider.name).toBe('Chrome AI (Gemini Nano)');
-      expect(mockAI.canCreateTextSession).toHaveBeenCalled();
-      expect(mockAI.createTextSession).toHaveBeenCalled();
+      expect(mockLanguageModel.availability).toHaveBeenCalled();
+      expect(mockLanguageModel.create).toHaveBeenCalled();
     });
 
     it('should select first available provider when no preference given', async () => {
@@ -83,16 +83,29 @@ describe('Provider Registry', () => {
     });
 
     it('should throw NoProviderAvailableError when no providers work', async () => {
-      delete (window as Window & { ai?: MockAI }).ai;
+      delete (globalThis as any).LanguageModel;
+
+      // Also make mock-ai fail by mocking it to throw
+      const { MockAIProvider } = await import('../providers/mock-ai');
+      const originalInitialize = MockAIProvider.prototype.initialize;
+      MockAIProvider.prototype.initialize = vi.fn().mockRejectedValue(new Error('Mock provider failed'));
 
       await expect(selectProvider()).rejects.toThrow(NoProviderAvailableError);
       await expect(selectProvider()).rejects.toThrow(
         'No AI provider available'
       );
+
+      // Restore original
+      MockAIProvider.prototype.initialize = originalInitialize;
     });
 
     it('should include error details for each failed provider', async () => {
-      delete (window as Window & { ai?: MockAI }).ai;
+      delete (globalThis as any).LanguageModel;
+
+      // Make mock-ai also fail
+      const { MockAIProvider } = await import('../providers/mock-ai');
+      const originalInitialize = MockAIProvider.prototype.initialize;
+      MockAIProvider.prototype.initialize = vi.fn().mockRejectedValue(new Error('Mock provider failed'));
 
       try {
         await selectProvider();
@@ -104,16 +117,22 @@ describe('Provider Registry', () => {
         } else {
           throw error;
         }
+      } finally {
+        // Restore original
+        MockAIProvider.prototype.initialize = originalInitialize;
       }
     });
 
-    it('should fall back to next provider if preferred fails', async () => {
-      // With only one provider, this test should throw when it fails
-      // In the future with multiple providers, it would fallback
-      mockAI.canCreateTextSession.mockResolvedValueOnce('no');
+    it('should not fallback when preferred provider fails', async () => {
+      // When chrome-ai fails and it's the preferred provider, should throw immediately
+      // without trying other providers
+      delete (globalThis as any).LanguageModel;
 
       await expect(selectProvider('chrome-ai')).rejects.toThrow(
         NoProviderAvailableError
+      );
+      await expect(selectProvider('chrome-ai')).rejects.toThrow(
+        "Preferred provider 'chrome-ai' failed"
       );
     });
 
@@ -124,27 +143,16 @@ describe('Provider Registry', () => {
       await selectProvider('chrome-ai');
 
       // Should only be initialized once (not tried again in fallback)
-      expect(mockAI.createTextSession).toHaveBeenCalledTimes(1);
+      expect(mockLanguageModel.create).toHaveBeenCalledTimes(1);
 
       consoleSpy.mockRestore();
       warnSpy.mockRestore();
     });
 
-    it('should log provider selection', async () => {
-      const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
-
-      await selectProvider('chrome-ai');
-
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('Selected preferred provider: chrome-ai')
-      );
-
-      consoleSpy.mockRestore();
-    });
 
     it('should warn when preferred provider fails', async () => {
       const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-      mockAI.canCreateTextSession.mockResolvedValueOnce('no');
+      mockLanguageModel.availability.mockResolvedValueOnce('no');
 
       await selectProvider('chrome-ai').catch(() => {}); // Ignore error
 
@@ -157,10 +165,25 @@ describe('Provider Registry', () => {
     });
 
     it('should handle provider health check failure', async () => {
-      // Make health check fail by returning 'no' availability
-      mockAI.canCreateTextSession.mockResolvedValue('no');
+      // Make chrome-ai health check fail by returning 'no' availability
+      mockLanguageModel.availability.mockResolvedValue('no');
 
-      await expect(selectProvider()).rejects.toThrow(NoProviderAvailableError);
+      // Without preference, should fallback to mock-ai (which works)
+      const provider = await selectProvider();
+
+      // Should have selected mock-ai as fallback
+      expect(provider.name).toBe('Mock AI');
+    });
+
+    it('should allow fallback when allowFallback=true', async () => {
+      // Make chrome-ai unavailable
+      mockLanguageModel.availability.mockResolvedValueOnce('no');
+
+      // Should fallback to mock-ai when allowFallback=true
+      const provider = await selectProvider('chrome-ai', true);
+
+      expect(provider).toBeDefined();
+      expect(provider.name).not.toBe('Chrome AI (Gemini Nano)');
     });
   });
 
@@ -186,7 +209,7 @@ describe('Provider Registry', () => {
     });
 
     it('should return false when provider is unavailable', async () => {
-      delete (window as Window & { ai?: MockAI }).ai;
+      delete (globalThis as any).LanguageModel;
 
       const availability = await checkProviderAvailability();
       expect(availability.get('chrome-ai')).toBe(false);
@@ -200,7 +223,7 @@ describe('Provider Registry', () => {
     });
 
     it('should not throw on provider errors', async () => {
-      mockAI.canCreateTextSession.mockRejectedValue(new Error('API error'));
+      mockLanguageModel.availability.mockRejectedValue(new Error('API error'));
 
       const availability = await checkProviderAvailability();
       expect(availability.get('chrome-ai')).toBe(false);
@@ -227,15 +250,12 @@ describe('Provider Registry', () => {
     });
 
     it('should create uninitialized provider', async () => {
-      // Remove window.ai to ensure it's truly uninitialized
-      delete (window as Window & { ai?: MockAI }).ai;
+      // Remove LanguageModel to ensure it's truly uninitialized
+      delete (globalThis as any).LanguageModel;
 
       const provider = createProvider('chrome-ai');
       const health = await provider.healthCheck();
       expect(health.available).toBe(false);
-
-      // Restore for other tests
-      (window as Window & { ai?: MockAI }).ai = mockAI;
     });
 
     it('should throw for unknown provider', () => {

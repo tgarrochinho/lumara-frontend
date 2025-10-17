@@ -4,7 +4,7 @@
  * Tests for the memory preview and edit UI component.
  */
 
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryExtraction } from '../MemoryExtraction';

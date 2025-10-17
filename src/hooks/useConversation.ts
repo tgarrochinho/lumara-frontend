@@ -101,6 +101,12 @@ export function useConversation(): UseConversationReturn {
         .slice(-5)
         .map(m => `${m.role}: ${m.content}`);
 
+      // Add response length instruction based on message type
+      if (!isQuestion) {
+        // For statements: Keep responses very brief
+        context.unshift('IMPORTANT: Keep your response very brief (1-2 sentences max). Acknowledge the information concisely.');
+      }
+
       // For questions: Search memories using semantic similarity
       if (isQuestion && memories && memories.length > 0) {
         try {

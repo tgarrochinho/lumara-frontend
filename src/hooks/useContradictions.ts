@@ -6,7 +6,6 @@
  */
 
 import { useState, useCallback } from 'react';
-import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../lib/db';
 import { detectContradictions, type ContradictionResult } from '../lib/ai/utils/contradiction';
 import { selectProvider } from '../lib/ai/registry';
@@ -42,18 +41,15 @@ export function useContradictions(): UseContradictionsReturn {
   const [contradictions, setContradictions] = useState<ContradictionResult[]>([]);
   const [isChecking, setIsChecking] = useState(false);
 
-  // Get all existing memories
-  const existingMemories = useLiveQuery(
-    () => db.memories.toArray(),
-    []
-  );
-
   const checkForContradictions = useCallback(async (newMemory: {
     id: number;
     content: string;
     embedding: number[];
   }) => {
-    if (!existingMemories || existingMemories.length === 0) {
+    // Query memories directly to always get fresh data without recreating callback
+    const allMemories = await db.memories.toArray();
+
+    if (!allMemories || allMemories.length === 0) {
       setContradictions([]);
       return;
     }
@@ -66,7 +62,7 @@ export function useContradictions(): UseContradictionsReturn {
       const aiProvider = await selectProvider(config.provider, config);
 
       // Prepare existing memories for contradiction detection
-      const memoriesWithEmbeddings = existingMemories
+      const memoriesWithEmbeddings = allMemories
         .filter(m => m.embedding && m.id !== newMemory.id)
         .map(m => ({
           id: String(m.id),
@@ -90,7 +86,7 @@ export function useContradictions(): UseContradictionsReturn {
     } finally {
       setIsChecking(false);
     }
-  }, [existingMemories]);
+  }, []); // No dependencies - always uses fresh data from DB
 
   const clearContradictions = useCallback(() => {
     setContradictions([]);

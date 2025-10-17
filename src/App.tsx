@@ -1,5 +1,6 @@
 import './App.css'
 import { useState } from 'react'
+import { Toaster } from 'react-hot-toast'
 import { ChatInterface } from '@/components/conversation/ChatInterface'
 import { MemoryList } from '@/components/memories/MemoryList'
 
@@ -8,6 +9,31 @@ function App() {
 
   return (
     <div className="h-screen flex flex-col bg-gray-50">
+      {/* Toast Notifications */}
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          duration: 3000,
+          style: {
+            background: '#363636',
+            color: '#fff',
+          },
+          success: {
+            duration: 3000,
+            iconTheme: {
+              primary: '#4ade80',
+              secondary: '#fff',
+            },
+          },
+          error: {
+            duration: 4000,
+            iconTheme: {
+              primary: '#ef4444',
+              secondary: '#fff',
+            },
+          },
+        }}
+      />
       {/* Header */}
       <header className="bg-white border-b border-gray-200 px-4 md:px-6 py-4">
         <div className="flex items-center justify-between">

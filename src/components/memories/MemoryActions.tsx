@@ -6,6 +6,7 @@
  */
 
 import { useState } from 'react';
+import toast from 'react-hot-toast';
 import { type Memory } from '@/lib/db';
 
 export interface MemoryActionsProps {
@@ -41,9 +42,10 @@ export function MemoryActions({ memory, onEdit, onDelete }: MemoryActionsProps) 
     try {
       await onDelete(memory.id!);
       setIsDeleteConfirmOpen(false);
+      toast.success('Memory deleted successfully');
     } catch (error) {
       console.error('Failed to delete memory:', error);
-      alert('Failed to delete memory. Please try again.');
+      toast.error('Failed to delete memory. Please try again.');
     } finally {
       setIsDeleting(false);
     }
@@ -140,7 +142,7 @@ function EditMemoryModal({ memory, onSave, onCancel }: EditMemoryModalProps) {
 
   const handleSave = async () => {
     if (!content.trim()) {
-      alert('Memory content cannot be empty');
+      toast.error('Memory content cannot be empty');
       return;
     }
 
@@ -151,9 +153,10 @@ function EditMemoryModal({ memory, onSave, onCancel }: EditMemoryModalProps) {
         type,
         tags: tags.split(',').map(t => t.trim()).filter(Boolean),
       });
+      toast.success('Memory updated successfully');
     } catch (error) {
       console.error('Failed to save memory:', error);
-      alert('Failed to save changes. Please try again.');
+      toast.error('Failed to save changes. Please try again.');
     } finally {
       setIsSaving(false);
     }
@@ -191,7 +194,7 @@ function EditMemoryModal({ memory, onSave, onCancel }: EditMemoryModalProps) {
             >
               <option value="knowledge">🧠 Knowledge</option>
               <option value="experience">📅 Experience</option>
-              <option value="procedure">📋 Procedure</option>
+              <option value="method">📋 Method</option>
             </select>
           </div>
 

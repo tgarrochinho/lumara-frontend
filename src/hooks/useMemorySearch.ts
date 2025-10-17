@@ -90,8 +90,8 @@ export function useMemorySearch(debounceMs = 300): UseMemorySearchReturn {
 
   // Determine which memories to show
   const memories = (() => {
-    // If searching, use search results
-    if (debouncedQuery.trim() && searchResults.length > 0) {
+    // If searching, use search results (even if empty)
+    if (debouncedQuery.trim()) {
       const filtered = filterType === 'all'
         ? searchResults
         : searchResults.filter(m => m.type === filterType);

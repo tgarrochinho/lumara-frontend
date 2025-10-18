@@ -1,137 +1,93 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
-import { testPathAlias, greet } from '@/utils/test'
-import { StoreTest } from '@/components/StoreTest'
-import { DexieTest } from '@/components/DexieTest'
-import { QueryTest } from '@/components/QueryTest'
-import { Button } from '@/components/ui/Button'
-import { Card } from '@/components/ui/Card'
-import { Input } from '@/components/ui/Input'
-import { AnimationExamples } from '@/components/examples/AnimationExamples'
+import { useState } from 'react'
+import { Toaster } from 'react-hot-toast'
+import { ChatInterface } from '@/components/conversation/ChatInterface'
+import { MemoryList } from '@/components/memories/MemoryList'
 
 function App() {
-  const [count, setCount] = useState(0)
-
-  // Test path aliases (development only)
-  if (import.meta.env.DEV) {
-    console.log(testPathAlias())
-    console.log(greet('Lumara'))
-  }
+  const [showMemories, setShowMemories] = useState(false)
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount(count => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-
-      {/* Zustand Store Test Component */}
-      <StoreTest />
-
-      {/* Dexie Database Test Component - Issue #6 */}
-      <DexieTest />
-
-      {/* TanStack Query Test Component - Issue #8 */}
-      <QueryTest />
-
-      {/* Tailwind CSS Test - Issue #9 */}
-      <div className="mt-8 p-6 rounded-lg bg-brand-indigo/10 border border-brand-violet">
-        <h2 className="text-2xl font-sans font-bold text-brand-violet mb-2">
-          Tailwind CSS Configured
-        </h2>
-        <p className="text-sm font-mono text-gray-300">
-          Custom colors, typography, and dark mode working
-        </p>
-      </div>
-
-      {/* Base UI Components Test - Issue #10 */}
-      <div className="mt-8">
-        <Card className="max-w-2xl mx-auto space-y-6">
-          <h2 className="text-2xl font-bold text-white">Base UI Components</h2>
-
-          {/* Button variants */}
-          <div className="space-y-4">
-            <div>
-              <h3 className="text-sm font-medium text-white/60 mb-2">
-                Button Variants
-              </h3>
-              <div className="flex flex-wrap gap-2">
-                <Button variant="primary">Primary</Button>
-                <Button variant="secondary">Secondary</Button>
-                <Button variant="ghost">Ghost</Button>
-              </div>
-            </div>
-
-            {/* Button sizes */}
-            <div>
-              <h3 className="text-sm font-medium text-white/60 mb-2">
-                Button Sizes
-              </h3>
-              <div className="flex flex-wrap items-center gap-2">
-                <Button size="sm">Small</Button>
-                <Button size="md">Medium</Button>
-                <Button size="lg">Large</Button>
-              </div>
-            </div>
-          </div>
-
-          {/* Input component */}
-          <div className="space-y-4">
-            <div>
-              <h3 className="text-sm font-medium text-white/60 mb-2">
-                Input Component
-              </h3>
-              <Input placeholder="Enter your text here..." />
-            </div>
-
-            <div>
-              <h3 className="text-sm font-medium text-white/60 mb-2">
-                Input with Error
-              </h3>
-              <Input
-                placeholder="Invalid input"
-                error="This field is required"
-              />
-            </div>
-          </div>
-
-          {/* Nested Card */}
+    <div className="h-screen flex flex-col bg-gray-50">
+      {/* Toast Notifications */}
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          duration: 3000,
+          style: {
+            background: '#363636',
+            color: '#fff',
+          },
+          success: {
+            duration: 3000,
+            iconTheme: {
+              primary: '#4ade80',
+              secondary: '#fff',
+            },
+          },
+          error: {
+            duration: 4000,
+            iconTheme: {
+              primary: '#ef4444',
+              secondary: '#fff',
+            },
+          },
+        }}
+      />
+      {/* Header */}
+      <header className="bg-white border-b border-gray-200 px-4 md:px-6 py-4">
+        <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-sm font-medium text-white/60 mb-2">
-              Nested Card
-            </h3>
-            <Card className="bg-white/3">
-              <p className="text-white/80">
-                Cards can be nested and styled with custom classes
-              </p>
-            </Card>
+            <h1 className="text-xl md:text-2xl font-bold text-gray-900">Lumara</h1>
+            <p className="text-xs md:text-sm text-gray-600">Your metacognitive AI partner</p>
           </div>
-        </Card>
-      </div>
 
-      {/* Animation Examples - Issue #11 */}
-      <div className="mt-8">
-        <AnimationExamples />
+          {/* Mobile Menu Toggle */}
+          <button
+            onClick={() => setShowMemories(!showMemories)}
+            className="md:hidden px-3 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium"
+            aria-label={showMemories ? 'Show chat' : 'Show memories'}
+            aria-expanded={showMemories}
+          >
+            {showMemories ? 'Chat' : 'Memories'}
+          </button>
+        </div>
+      </header>
+
+      {/* Main Content - Responsive Layout */}
+      <div className="flex-1 flex overflow-hidden">
+        {/* Chat Interface - Hidden on mobile when memories are shown */}
+        <div
+          className={`
+            flex-1 border-r border-gray-200
+            ${showMemories ? 'hidden md:flex' : 'flex'}
+          `}
+          role="main"
+          aria-label="Chat interface"
+        >
+          <ChatInterface />
+        </div>
+
+        {/* Memory List - Full width on mobile, sidebar on desktop */}
+        <div
+          className={`
+            w-full md:w-96 bg-gray-50
+            ${showMemories ? 'flex' : 'hidden md:flex'}
+          `}
+          role="complementary"
+          aria-label="Memory list"
+        >
+          <div className="h-full flex flex-col w-full">
+            <div className="p-4 bg-white border-b border-gray-200">
+              <h2 className="text-lg font-semibold text-gray-900">Memories</h2>
+            </div>
+            <div className="flex-1 overflow-hidden">
+              <MemoryList />
+            </div>
+          </div>
+        </div>
       </div>
-    </>
+    </div>
   )
 }
 

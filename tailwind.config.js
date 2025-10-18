@@ -107,16 +107,12 @@ export default {
    * Plugins
    *
    * Tailwind plugins add additional utilities, components, or functionality.
-   * Currently empty - plugins can be added as needed:
-   * - @tailwindcss/forms: Better form styling
-   * - @tailwindcss/typography: Prose styling for rich text
-   * - @tailwindcss/aspect-ratio: Aspect ratio utilities
-   * - Custom plugins: Project-specific utilities
    *
-   * Example:
-   * plugins: [
-   *   require('@tailwindcss/forms'),
-   * ],
+   * Active plugins:
+   * - @tailwindcss/typography: Prose styling for markdown/rich text content
+   *   Used for rendering AI responses with proper markdown formatting
    */
-  plugins: [],
+  plugins: [
+    require('@tailwindcss/typography'),
+  ],
 }

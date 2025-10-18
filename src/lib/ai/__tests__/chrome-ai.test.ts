@@ -7,19 +7,14 @@ import { ChromeAIProvider } from '../providers/chrome-ai';
 import { ProviderInitializationError } from '../types';
 
 // Mock Chrome AI API
-interface MockAI {
-  canCreateTextSession: ReturnType<typeof vi.fn>;
-  createTextSession: ReturnType<typeof vi.fn>;
-}
-
 interface MockTextSession {
   prompt: ReturnType<typeof vi.fn>;
+  promptStreaming?: (input: string) => AsyncIterable<string>;
   destroy?: ReturnType<typeof vi.fn>;
 }
 
 describe('ChromeAIProvider', () => {
   let provider: ChromeAIProvider;
-  let mockAI: MockAI;
   let mockSession: MockTextSession;
 
   beforeEach(() => {
@@ -31,23 +26,19 @@ describe('ChromeAIProvider', () => {
       destroy: vi.fn(),
     };
 
-    // Create mock AI API
-    mockAI = {
-      canCreateTextSession: vi.fn(),
-      createTextSession: vi.fn(),
+    // Setup Chrome 141+ global LanguageModel API (default)
+    const mockLanguageModel = {
+      availability: vi.fn().mockResolvedValue('readily'),
+      create: vi.fn().mockResolvedValue(mockSession),
     };
 
-    // Setup default successful behavior
-    mockAI.canCreateTextSession.mockResolvedValue('readily');
-    mockAI.createTextSession.mockResolvedValue(mockSession);
-
-    // Install mock in window
-    (window as Window & { ai?: MockAI }).ai = mockAI;
+    (globalThis as any).LanguageModel = mockLanguageModel;
+    (window as Window & { isSecureContext: boolean }).isSecureContext = true;
   });
 
   afterEach(() => {
     // Cleanup
-    delete (window as Window & { ai?: MockAI }).ai;
+    delete (globalThis as any).LanguageModel;
   });
 
   describe('provider metadata', () => {
@@ -67,32 +58,33 @@ describe('ChromeAIProvider', () => {
       expect(provider.capabilities).toEqual({
         chat: true,
         embeddings: false,
-        streaming: false,
+        streaming: true,
         multimodal: false,
       });
     });
   });
 
   describe('initialize', () => {
-    it('should successfully initialize when Chrome AI is available', async () => {
+    it('should successfully initialize when Chrome 141+ API is available', async () => {
       await provider.initialize();
 
-      expect(mockAI.canCreateTextSession).toHaveBeenCalled();
-      expect(mockAI.createTextSession).toHaveBeenCalled();
+      expect((globalThis as any).LanguageModel.availability).toHaveBeenCalled();
+      expect((globalThis as any).LanguageModel.create).toHaveBeenCalled();
       expect(provider['initialized']).toBe(true);
       expect(provider['session']).toBe(mockSession);
     });
 
-    it('should throw when window.ai is not available', async () => {
-      delete (window as Window & { ai?: MockAI }).ai;
+    it('should throw when LanguageModel API is not available', async () => {
+      delete (globalThis as any).LanguageModel;
 
       const error = await provider.initialize().catch(e => e);
       expect(error).toBeInstanceOf(ProviderInitializationError);
-      expect(error.cause?.message).toContain('Chrome AI not available');
+      expect(error.cause?.message).toContain('Chrome AI global LanguageModel API not found');
+      expect(error.cause?.message).toContain('Chrome 141+');
     });
 
     it('should throw when model is not available (no)', async () => {
-      mockAI.canCreateTextSession.mockResolvedValue('no');
+      (globalThis as any).LanguageModel.availability.mockResolvedValue('no');
 
       const error = await provider.initialize().catch(e => e);
       expect(error).toBeInstanceOf(ProviderInitializationError);
@@ -100,7 +92,7 @@ describe('ChromeAIProvider', () => {
     });
 
     it('should throw when model needs download', async () => {
-      mockAI.canCreateTextSession.mockResolvedValue('after-download');
+      (globalThis as any).LanguageModel.availability.mockResolvedValue('after-download');
 
       const error = await provider.initialize().catch(e => e);
       expect(error).toBeInstanceOf(ProviderInitializationError);
@@ -111,33 +103,35 @@ describe('ChromeAIProvider', () => {
       const config = { temperature: 0.8 };
       await provider.initialize(config);
 
-      expect(mockAI.createTextSession).toHaveBeenCalledWith({ temperature: 0.8 });
+      expect((globalThis as any).LanguageModel.create).toHaveBeenCalledWith({ temperature: 0.8 });
     });
 
-    it('should log success message', async () => {
-      const consoleSpy = vi.spyOn(console, 'log');
-      await provider.initialize();
+    it('should support system prompts', async () => {
+      const config = { systemPrompt: 'You are a helpful assistant.' };
+      await provider.initialize(config as any);
 
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('initialized successfully')
+      expect((globalThis as any).LanguageModel.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          systemPrompt: 'You are a helpful assistant.',
+        })
       );
-
-      consoleSpy.mockRestore();
     });
+
   });
 
   describe('healthCheck', () => {
-    it('should return unavailable when window.ai is missing', async () => {
-      delete (window as Window & { ai?: MockAI }).ai;
+    it('should return unavailable when LanguageModel API is missing', async () => {
+      delete (globalThis as any).LanguageModel;
 
       const health = await provider.healthCheck();
       expect(health.available).toBe(false);
       expect(health.status).toBe('unavailable');
-      expect(health.message).toContain('Chrome AI API not available');
+      expect(health.message).toContain('Chrome AI global LanguageModel API not found');
+      expect(health.message).toContain('Chrome 141+');
     });
 
     it('should return unavailable when model is not supported', async () => {
-      mockAI.canCreateTextSession.mockResolvedValue('no');
+      (globalThis as any).LanguageModel.availability.mockResolvedValue('no');
 
       const health = await provider.healthCheck();
       expect(health.available).toBe(false);
@@ -146,7 +140,7 @@ describe('ChromeAIProvider', () => {
     });
 
     it('should return initializing when model is downloading', async () => {
-      mockAI.canCreateTextSession.mockResolvedValue('after-download');
+      (globalThis as any).LanguageModel.availability.mockResolvedValue('after-download');
 
       const health = await provider.healthCheck();
       expect(health.available).toBe(false);
@@ -161,10 +155,11 @@ describe('ChromeAIProvider', () => {
       expect(health.available).toBe(true);
       expect(health.status).toBe('ready');
       expect(health.message).toContain('ready');
+      expect(health.message).toContain('Chrome 141+');
     });
 
     it('should return error status when check fails', async () => {
-      mockAI.canCreateTextSession.mockRejectedValue(new Error('API error'));
+      (globalThis as any).LanguageModel.availability.mockRejectedValue(new Error('API error'));
 
       const health = await provider.healthCheck();
       expect(health.available).toBe(false);
@@ -205,13 +200,11 @@ describe('ChromeAIProvider', () => {
 
     it('should auto-initialize if not initialized', async () => {
       const uninitializedProvider = new ChromeAIProvider();
-      (window as Window & { ai?: MockAI }).ai = mockAI;
-
       mockSession.prompt.mockResolvedValue('AI response');
 
       const response = await uninitializedProvider.chat('Hello');
       expect(response).toBe('AI response');
-      expect(mockAI.createTextSession).toHaveBeenCalled();
+      expect((globalThis as any).LanguageModel.create).toHaveBeenCalled();
     });
 
     it('should throw descriptive error on chat failure', async () => {
@@ -253,16 +246,112 @@ describe('ChromeAIProvider', () => {
       expect(provider['session']).toBe(null);
     });
 
-    it('should log disposal message', async () => {
-      const consoleSpy = vi.spyOn(console, 'log');
+  });
+
+
+  describe('secure context check', () => {
+    it('should throw when not in secure context', async () => {
+      (window as Window & { isSecureContext: boolean }).isSecureContext = false;
+
+      const error = await provider.initialize().catch(e => e);
+      expect(error).toBeInstanceOf(ProviderInitializationError);
+      expect(error.cause?.message).toContain('secure context');
+      expect(error.cause?.message).toContain('HTTPS');
+    });
+
+    it('should return unavailable health status in insecure context', async () => {
+      (window as Window & { isSecureContext: boolean }).isSecureContext = false;
+
+      const health = await provider.healthCheck();
+      expect(health.available).toBe(false);
+      expect(health.status).toBe('unavailable');
+      expect(health.message).toContain('HTTPS');
+    });
+  });
+
+  describe('streaming', () => {
+    beforeEach(async () => {
+      // Add streaming support to mock session
+      mockSession.promptStreaming = async function* (_input: string) {
+        yield 'Hello ';
+        yield 'world';
+        yield '!';
+      };
+
       await provider.initialize();
-      await provider.dispose();
+    });
 
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('disposed')
-      );
+    it('should stream responses', async () => {
+      const chunks: string[] = [];
 
-      consoleSpy.mockRestore();
+      for await (const chunk of provider.chatStream('Test')) {
+        chunks.push(chunk);
+      }
+
+      expect(chunks).toEqual(['Hello ', 'world', '!']);
+    });
+
+    it('should include context in streamed prompts', async () => {
+      const streamSpy = vi.spyOn(mockSession, 'promptStreaming' as any);
+
+      const chunks: string[] = [];
+      for await (const chunk of provider.chatStream('New message', ['Context 1'])) {
+        chunks.push(chunk);
+      }
+
+      expect(streamSpy).toHaveBeenCalledWith(expect.stringContaining('Context:'));
+      expect(streamSpy).toHaveBeenCalledWith(expect.stringContaining('Context 1'));
+    });
+
+    it('should throw if streaming not supported', async () => {
+      mockSession.promptStreaming = undefined;
+
+      // Try to consume the generator
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        for await (const _chunk of provider.chatStream('Test')) {
+          // Should not get here
+        }
+        expect.fail('Should have thrown an error');
+      } catch (error) {
+        expect(error).toBeInstanceOf(Error);
+        expect((error as Error).message).toContain('Streaming is not supported');
+      }
+    });
+  });
+
+  describe('model download', () => {
+    it('should trigger download when status is after-download', async () => {
+      (globalThis as any).LanguageModel.availability.mockResolvedValue('after-download');
+      mockSession.destroy = vi.fn();
+
+      const result = await provider.downloadModel();
+
+      expect((globalThis as any).LanguageModel.create).toHaveBeenCalled();
+      expect(mockSession.destroy).toHaveBeenCalled();
+      expect(result).toBe('readily');
+    });
+
+    it('should return readily when model is available', async () => {
+      (globalThis as any).LanguageModel.availability.mockResolvedValue('readily');
+
+      const result = await provider.downloadModel();
+
+      expect(result).toBe('readily');
+    });
+
+    it('should return no when model is not supported', async () => {
+      (globalThis as any).LanguageModel.availability.mockResolvedValue('no');
+
+      const result = await provider.downloadModel();
+
+      expect(result).toBe('no');
+    });
+
+    it('should throw when LanguageModel API is not available', async () => {
+      delete (globalThis as any).LanguageModel;
+
+      await expect(provider.downloadModel()).rejects.toThrow('Chrome AI global LanguageModel API not found');
     });
   });
 });

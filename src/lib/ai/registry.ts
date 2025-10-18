@@ -8,17 +8,23 @@
 import type { AIProvider } from './types';
 import { NoProviderAvailableError } from './types';
 import { ChromeAIProvider } from './providers/chrome-ai';
+import { GeminiProvider } from './providers/gemini';
+import { MockAIProvider } from './providers/mock-ai';
 
 /**
  * Registry of available provider implementations
  *
  * New providers can be added here as they are implemented.
  * Each key corresponds to a ProviderType and maps to a provider class constructor.
+ *
+ * When you specify a preferred provider, NO FALLBACK will occur by default.
+ * Use allowFallback=true if you want automatic fallback behavior.
  */
 export const providerRegistry = {
-  'chrome-ai': ChromeAIProvider,
-  // Future providers will be added here:
-  // 'gemini': GeminiAPIProvider,
+  'gemini': GeminiProvider, // Google Gemini API (cloud, requires API key)
+  'chrome-ai': ChromeAIProvider, // Chrome 141+ with global LanguageModel API (local)
+  'mock-ai': MockAIProvider, // Mock provider for development/testing
+  // Future providers:
   // 'lm-studio': LMStudioProvider,
   // 'openai': OpenAIProvider,
   // 'claude': ClaudeProvider,
@@ -27,7 +33,7 @@ export const providerRegistry = {
 /**
  * Type for provider class constructors
  */
-type ProviderConstructor = new () => AIProvider;
+type ProviderConstructor = new (...args: any[]) => AIProvider;
 
 /**
  * Registry type derived from the actual registry object
@@ -38,25 +44,29 @@ export type RegisteredProvider = keyof typeof providerRegistry;
  * Select and initialize an AI provider
  *
  * This function tries to find an available provider using the following strategy:
- * 1. If a preferred provider is specified and available, use it
- * 2. Otherwise, try all registered providers in order
+ * 1. If a preferred provider is specified, ONLY try that provider (no fallback)
+ * 2. If no preferred provider specified, try all registered providers in order
  * 3. Throw NoProviderAvailableError if no provider works
  *
- * @param preferredProvider - Optional preferred provider to try first
+ * @param preferredProvider - Optional preferred provider (if specified, no fallback will occur)
+ * @param providerConfig - Configuration for the provider (API key, etc.)
+ * @param allowFallback - If true and preferred provider fails, try others (default: false)
  * @returns An initialized and ready-to-use AI provider
  * @throws NoProviderAvailableError if no provider is available
  *
  * @example
  * ```typescript
- * // Try Chrome AI first, fallback to others if unavailable
- * const provider = await selectProvider('chrome-ai');
+ * // Try Gemini with API key
+ * const provider = await selectProvider('gemini', { apiKey: 'your-key' });
  *
- * // Automatically select any available provider
- * const provider = await selectProvider();
+ * // Try Chrome AI (no API key needed)
+ * const provider = await selectProvider('chrome-ai');
  * ```
  */
 export async function selectProvider(
-  preferredProvider?: RegisteredProvider
+  preferredProvider?: RegisteredProvider,
+  providerConfig?: any,
+  allowFallback = false
 ): Promise<AIProvider> {
   const errors: Array<{ provider: string; error: unknown }> = [];
 
@@ -64,16 +74,25 @@ export async function selectProvider(
   if (preferredProvider && providerRegistry[preferredProvider]) {
     const result = await tryProvider(
       preferredProvider,
-      providerRegistry[preferredProvider]
+      providerRegistry[preferredProvider],
+      providerConfig
     );
     if (result.success) {
-      console.log(`Selected preferred provider: ${preferredProvider}`);
       return result.provider;
     }
     errors.push({ provider: preferredProvider, error: result.error });
+
+    // If preferred provider specified and fallback not allowed, fail immediately
+    if (!allowFallback) {
+      const error = result.error;
+      const message = error instanceof Error ? error.message : String(error);
+      throw new NoProviderAvailableError(
+        `Preferred provider '${preferredProvider}' failed: ${message}`
+      );
+    }
   }
 
-  // Strategy 2: Try all providers in order
+  // Strategy 2: Try all providers in order (only if no preferred provider or fallback allowed)
   const providerEntries = Object.entries(providerRegistry) as Array<[RegisteredProvider, ProviderConstructor]>;
   for (const [name, ProviderClass] of providerEntries) {
     // Skip if this was already tried as preferred provider
@@ -81,9 +100,8 @@ export async function selectProvider(
       continue;
     }
 
-    const result = await tryProvider(name, ProviderClass);
+    const result = await tryProvider(name, ProviderClass, providerConfig);
     if (result.success) {
-      console.log(`Selected fallback provider: ${name}`);
       return result.provider;
     }
     errors.push({ provider: name, error: result.error });
@@ -107,20 +125,28 @@ export async function selectProvider(
  *
  * @param name - Provider name for logging
  * @param ProviderClass - Provider class constructor
+ * @param config - Configuration for the provider (e.g., API key for Gemini)
  * @returns Result object with success status
  */
 async function tryProvider(
   name: string,
-  ProviderClass: ProviderConstructor
+  ProviderClass: ProviderConstructor,
+  config?: any
 ): Promise<
   | { success: true; provider: AIProvider }
   | { success: false; error: unknown }
 > {
   try {
-    const provider = new ProviderClass();
+    // Create provider instance - pass API key to Gemini constructor
+    let provider: AIProvider;
+    if (name === 'gemini' && config?.apiKey) {
+      provider = new ProviderClass(config.apiKey);
+    } else {
+      provider = new ProviderClass();
+    }
 
-    // Try to initialize
-    await provider.initialize();
+    // Try to initialize with remaining config (systemPrompt, temperature, etc.)
+    await provider.initialize(config);
 
     // Verify it's actually available via health check
     const health = await provider.healthCheck();

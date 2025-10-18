@@ -5,12 +5,12 @@
 @layer base {
   /* Set dark mode as default with Lumara brand background */
   html {
-    @apply bg-[#0A0E1A] text-white;
+    @apply bg-[#0A0E1A];
   }
 
-  /* Ensure smooth font rendering */
+  /* Ensure smooth font rendering and default text color */
   body {
-    @apply antialiased;
+    @apply antialiased text-gray-900;
   }
 
   /* Improve text rendering on macOS/iOS */

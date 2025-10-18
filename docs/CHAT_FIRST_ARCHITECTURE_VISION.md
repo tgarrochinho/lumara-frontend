@@ -1,29 +1,56 @@
 # Chat-First Architecture Vision
 
 **Created:** 2025-10-16
-**Status:** Vision Document
-**Purpose:** Define the chat-only interface architecture that replaces the planned 3-panel UI with a conversational, thinking-visible experience.
+**Updated:** 2025-10-18 - Complete metacognitive intelligence layer, collaborative features, provenance tracking
+**Status:** Vision Document - Complete with Metacognitive Features
+**Purpose:** Define the chat-only interface architecture with full metacognitive intelligence, replacing the planned 3-panel UI with a conversational, thinking-visible, self-aware experience.
+
+## 🆕 Major Enhancements (Oct 18)
+
+Based on latest requirements and missing elements from previous vision, this document now includes:
+
+1. **Metacognitive Intelligence Layer** - Thinking pattern analysis, bias detection, calibration training
+2. **Causality & Decision Tracking** - Complete evidence chains for confidence changes with impact analysis
+3. **Collaborative Intelligence** - Team knowledge synthesis, perspective layers, collective patterns
+4. **Knowledge Provenance System** - Origin tracking, influence mapping, attribution analysis
+5. **Adaptive Interaction Modes** - Thinking styles detection, quick capture shortcuts, smart spaces
+6. **Multiple "Aha!" Moments** - Progressive revelation journey designed into the experience
+7. **Full-Screen Navigation System** - Immersive detail views with seamless transitions
+8. **Smart Context Panels** - Dynamic assistance during knowledge sharing
+9. **Confidence Calibration Training** - Help users become better at self-assessment
 
 ---
 
 ## 🎯 Executive Summary
 
-Transform Lumara from a **traditional 3-panel layout** (sidebar + main + tabs) into a **pure chat interface** with:
+Transform Lumara from a **traditional 3-panel layout** into a **metacognitive chat interface** that helps users think better, not just remember more:
 
-- **Deterministic AI reasoning** - Consistent, well-defined thinking steps shown before responses
-- **Memory Activity Heatmap** - GitHub-style visualization at top showing temporal memory patterns
-- **Enhanced Scrollbar** - Activity overlay revealing memory density at different time periods
+**Core Intelligence Features:**
+- **Metacognitive awareness** - Tracks thinking patterns, detects biases, provides calibration feedback
+- **Deterministic AI reasoning** - Consistent, predictable thinking steps build trust through transparency
+- **Causality tracking** - Every belief change linked to triggering evidence with impact cascade
+- **Collaborative synthesis** - Team perspectives, consensus building, collective intelligence
+- **Knowledge provenance** - Complete origin stories and influence maps for every belief
+- **Adaptive interaction** - Adjusts to user's thinking style (analytical/intuitive/pragmatic/theoretical)
+
+**Visual & Navigation:**
+- **Memory Activity Heatmap** - GitHub-style visualization showing meaningful milestones, not just counts
+- **Enhanced Scrollbar** - Activity overlay with content type indicators (📋 📖 ⚡ 💡)
 - **Temporal Navigation** - Click any widget/memory to "time travel" to source conversation
-- **Widget-based intermediate results** - Structured visual components for complex data
-- **Quick action buttons** - Contextual actions without requiring commands
-- **Slash command system** - Expert power user shortcuts (optional)
-- **Psychology-based backend** - Reuse all existing memory algorithms and logic
+- **Full-screen details** - Immersive views for complex content without cramped panels
+- **Smart context panels** - Dynamic assistance appears during knowledge entry/questioning
+
+**Interaction Modes:**
+- **Quick capture shortcuts** - `!` for contradictions, `+/-` for confidence, `?` for testing
+- **Memory spaces** - Contextual organization (work/personal/team/archive)
+- **Progressive disclosure** - Beginners get buttons, experts use slash commands
+- **Multiple "aha!" moments** - Designed progression of discoveries throughout usage
 
 **Key Insights:**
-1. **Presentation layer change** - All psychology-based algorithms, memory types, and intelligence from Waves 1-5 remain intact. We're changing HOW users interact, not WHAT the system does.
-2. **Deterministic thinking** - AI reasoning follows the same predictable steps every time, building trust and transparency through consistency.
-3. **Temporal over spatial** - Replace sidebar browsing with time-based navigation through conversation history.
-4. **Progressive disclosure** - Beginners get contextual buttons, experts use slash commands. Same power, different paths.
+1. **Metacognitive partner** - Beyond memory, it helps users understand HOW they think and improve
+2. **Presentation + intelligence** - Psychology algorithms enhanced with pattern recognition & coaching
+3. **Temporal over spatial** - Time-based navigation replaces sidebars, everything flows through chat
+4. **Calibration focus** - Helps users become better at self-assessment and confidence accuracy
 
 ---
 
@@ -63,6 +90,240 @@ AI can interrupt, but only when:
 - **Critical**: Dangerous contradictions, safety issues
 - **Important**: Useful patterns, consolidation needs
 - **Passive**: Minor insights available on-demand
+
+### 7. **Full-Screen Detail Views**
+Complex content uses the entire chat window for immersive exploration:
+- Click any playbook, guide, or detailed content → full-screen view
+- Chat slides left, detail slides in from right
+- Back button preserves exact scroll position
+- No side panels needed - everything uses full viewport
+- Rich formatting and navigation within detail views
+
+### 8. **Metacognitive Awareness**
+AI helps users understand their own thinking patterns:
+- Tracks cognitive biases (overconfidence, confirmation, recency)
+- Provides calibration feedback on prediction accuracy
+- Identifies learning style and adapts presentation
+- Coaches improvement in weak areas
+- Shows thinking patterns across domains
+
+---
+
+## 🧠 Metacognitive Intelligence Layer
+
+### Core Metacognitive Features
+
+#### 1. **Thinking Pattern Analysis**
+System tracks and reveals user's cognitive patterns:
+
+```typescript
+interface MetacognitiveProfile {
+  thinkingPatterns: {
+    overconfidenceBias: {
+      domains: Map<string, BiasMetrics>;
+      severity: number; // 0-1 scale
+      improvement: TrendLine;
+    };
+    confirmationBias: BiasMetrics;
+    recencyBias: BiasMetrics;
+    dunningKrugerZones: Domain[]; // Where they don't know what they don't know
+  };
+
+  learningStyle: {
+    primary: 'visual' | 'verbal' | 'kinesthetic' | 'analytical';
+    comprehensionPatterns: {
+      bestTimeOfDay: TimeRange;
+      optimalSessionLength: Duration;
+      consolidationRate: number;
+    };
+  };
+}
+```
+
+**In Chat:**
+```
+💭 Thinking Process...
+→ Analyzing your response pattern
+→ Detecting possible overconfidence (similar claims had 45% success)
+→ Suggesting evidence check
+
+AI: I notice you're very confident about this approach. Your past
+    predictions in system architecture with 90%+ confidence
+    succeeded 45% of the time.
+
+    🧠 Metacognitive Insight: You tend to overestimate technical
+    solutions before implementation. Your estimates become accurate
+    after one prototype.
+```
+
+#### 2. **Causality & Decision Tracking**
+Every belief change is tracked with complete evidence chains:
+
+```typescript
+interface BeliefEvolution {
+  belief: Memory;
+  confidenceHistory: Array<{
+    timestamp: Date;
+    oldConfidence: number;
+    newConfidence: number;
+    trigger: CausalityTrigger;
+    evidence: Evidence[];
+    userReasoning?: string; // Optional journal entry
+    impact: Impact[];
+  }>;
+}
+```
+
+**Evidence Chain Visualization:**
+```
+📍 Origin: "Microservices always better" (Jan, 40% from article)
+└─ Reinforced: AWS workshop (→ 60%)
+   └─ Validated: First project success (→ 85%)
+      └─ Challenged: Monolith faster for small team (→ 72%)
+         └─ Current: "Context-dependent choice" (72%)
+
+Attribution:
+• 45% personal experience
+• 25% team insights
+• 30% external sources
+```
+
+#### 3. **Collaborative Intelligence**
+Team knowledge synthesis with perspective layers:
+
+```
+┌─────────────────────────────────────────────────┐
+│ Team Perspective: REST API Design              │
+├─────────────────────────────────────────────────┤
+│ Consensus (4 members)                          │
+│ ████████░░ 76% average confidence              │
+│                                                  │
+│ You:    ████████░░ 80% "Clean and simple"     │
+│ Sarah:  █████████░ 85% "Well documented"       │
+│ Mike:   ██████░░░░ 60% "Needs versioning"      │
+│ Lisa:   ████████░░ 78% "Good for now"          │
+│                                                  │
+│ 🔍 Key Divergence: Mike sees scaling issues    │
+│ 💡 Collective Intelligence: Issues at 50+ endpoints│
+└─────────────────────────────────────────────────┘
+```
+
+#### 4. **Knowledge Provenance**
+Complete origin tracking for every belief:
+
+```typescript
+interface KnowledgeProvenance {
+  origin: {
+    type: 'experience' | 'learned' | 'told' | 'read' | 'observed';
+    source: Source;
+    timestamp: Date;
+    initialConfidence: number;
+  };
+
+  influenceMap: {
+    primaryInfluences: Memory[];
+    secondaryInfluences: Memory[];
+    contradictions: Memory[];
+  };
+}
+```
+
+---
+
+## 🎭 Adaptive Interaction Modes
+
+### Thinking Style Adaptation
+System detects and adapts to user's cognitive style:
+
+```typescript
+enum ThinkingStyle {
+  ANALYTICAL = 'analytical',   // Wants proof, logic chains
+  INTUITIVE = 'intuitive',     // Patterns, connections
+  PRAGMATIC = 'pragmatic',     // What works, practical
+  THEORETICAL = 'theoretical'  // Why it works, principles
+}
+```
+
+**Adaptive Responses:**
+- **Analytical**: Shows data, statistics, evidence chains
+- **Intuitive**: Emphasizes patterns, feelings, connections
+- **Pragmatic**: Focuses on ROI, practical steps, outcomes
+- **Theoretical**: Explains principles, frameworks, theory
+
+### Quick Capture Modes
+Friction-free input without conversation:
+
+```
+! Quick Contradiction
+  !gym Morning workouts drain energy
+
++ Strengthen Belief
+  +microservices Another successful deployment
+
+- Weaken Belief
+  -agile Sprint planning took 4 hours
+
+? Question/Test
+  ?tdd Does TDD really save time?
+
+@ Evidence Drop
+  @standups https://article-about-standups.com
+
+# Tag thought
+  #insight Coffee after 2pm disrupts sleep
+
+~ Rough idea
+  ~maybe Team morale linked to deploy frequency
+```
+
+### Memory Spaces
+Contextual organization within chat:
+
+```typescript
+interface MemorySpace {
+  name: string;
+  type: 'project' | 'domain' | 'personal' | 'team' | 'archive';
+  context: {
+    confidenceBaseline?: number;
+    allowContradictions?: boolean;
+    autoArchiveAfter?: Duration;
+  };
+}
+```
+
+**Space Switching:**
+```
+You: /space work
+AI: Switched to Work space (847 memories, 4 team members)
+
+You: /space personal
+AI: Switched to Personal space (234 memories, private)
+```
+
+---
+
+## 🎯 The Multiple "Aha!" Moments Journey
+
+### Progressive Discovery Design
+The experience is designed with multiple revelation moments:
+
+**Moment 1: "It caught my contradiction!" (Minute 5)**
+- User realizes AI remembers and connects across time
+
+**Moment 2: "It knows my confidence is off!" (Day 3)**
+- Discovery that accuracy is being tracked and patterns found
+
+**Moment 3: "It sees patterns I missed!" (Week 2)**
+- Non-obvious connections revealed (best decisions on Tuesday mornings)
+
+**Moment 4: "My beliefs actually evolved!" (Month 1)**
+- Evolution timeline shows intellectual growth journey
+
+**Moment 5: "My team sees differently!" (Month 2)**
+- Collective intelligence reveals unvoiced concerns
+
+**Moment 6: "It prevented a mistake!" (Month 3)**
+- Pattern recognition helps avoid repeating past failures
 
 ---
 
@@ -416,6 +677,47 @@ I'll remind you about your morning preference.
 
 ## 🧩 New Components Architecture
 
+### Core System Architecture
+```typescript
+interface LumaraCore {
+  // Chat & Memory
+  chat: ChatInterface;
+  memory: MemorySystem;
+
+  // NEW: Metacognitive Layer
+  metacognition: {
+    patterns: PatternEngine;
+    calibration: CalibrationSystem;
+    coaching: CoachingEngine;
+    biasDetection: BiasAnalyzer;
+  };
+
+  // NEW: Collaboration Layer
+  collaboration: {
+    spaces: SpaceManager;
+    perspectives: PerspectiveEngine;
+    consensus: ConsensusCalculator;
+    collective: CollectiveIntelligence;
+  };
+
+  // NEW: Provenance Layer
+  provenance: {
+    chains: EvidenceChainBuilder;
+    attribution: AttributionTracker;
+    influence: InfluenceMapper;
+    causality: CausalityTracker;
+  };
+
+  // NEW: Adaptive Layer
+  adaptation: {
+    style: ThinkingStyleDetector;
+    capture: QuickCaptureParser;
+    presentation: AdaptiveRenderer;
+    spaces: MemorySpaceManager;
+  };
+}
+```
+
 ### 1. **ThinkingProcess Component**
 Shows AI reasoning before responses with deterministic, well-defined steps.
 
@@ -423,6 +725,7 @@ Shows AI reasoning before responses with deterministic, well-defined steps.
 interface ThinkingProcessProps {
   steps: ThinkingStep[];
   widgets?: ThinkingWidget[];    // Structured intermediate results
+  metacognitive?: MetacognitiveInsight[];  // Pattern detections
   collapsible?: boolean;
 }
 
@@ -431,10 +734,14 @@ interface ThinkingStep {
   result?: string;         // "Found 3 matches"
   widget?: ReactNode;      // Optional widget for complex results
   duration?: number;       // ms
+  confidence?: number;     // AI's confidence in this step
+  bias?: BiasWarning;      // Detected bias in reasoning
 }
 
 interface ThinkingWidget {
-  type: 'memory-results' | 'comparison' | 'stats-preview' | 'action-buttons';
+  type: 'memory-results' | 'comparison' | 'stats-preview' |
+        'action-buttons' | 'pattern-detection' | 'team-perspective' |
+        'calibration-warning' | 'provenance-chain';
   data: any;
   interactive?: boolean;
 }
@@ -821,39 +1128,55 @@ interface ContradictionEvent {
   ↑ Scrollbar shows milestones (not counts)
   Hover: Rich overview with checkmarks & icons
 
-**Condensed State** (default, sticky at top):
+**Always-Visible State** (default, always present):
 ```tsx
-<header className="sticky top-0 z-50 bg-white border-b shadow-sm">
-  <div className="flex items-center gap-4 px-4 py-2">
-    {/* Expand button */}
-    <button onClick={expand}>
-      Memory Activity ▼
-    </button>
+<header className="fixed top-0 w-full z-50">
+  {/* Ultra-minimal always-visible activity indicator */}
+  <div className="h-2 bg-gray-100">
+    <ActivitySparkline days={7} height={8} />
+  </div>
 
-    {/* Mini 7-day heatmap */}
-    <div className="flex gap-0.5">
-      {last7Days.map(day => (
-        <div
-          className={`w-2 h-4 ${getIntensityColor(day)}`}
-          onMouseEnter={() => showTooltip(day)}
-          onClick={() => jumpToDate(day.date)}
-        />
-      ))}
+  {/* Condensed heatmap (sticky, expandable) */}
+  <div className="bg-white border-b shadow-sm">
+    <div className="flex items-center gap-4 px-4 py-2">
+      {/* Expand button */}
+      <button onClick={expand}>
+        Memory Activity ▼
+      </button>
+
+      {/* Mini 7-day heatmap with milestone icons */}
+      <div className="flex gap-0.5">
+        {last7Days.map(day => (
+          <div className="relative">
+            <div
+              className={`w-2 h-4 ${getIntensityColor(day)}`}
+              onMouseEnter={() => showTooltip(day)}
+              onClick={() => jumpToDate(day.date)}
+            />
+            {/* Icon for generated content */}
+            {day.hasGeneratedContent && (
+              <div className="absolute -top-1 -right-1 w-3 h-3">
+                {day.contentIcon} {/* 📋 for playbook, etc */}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+
+      {/* Quick stats */}
+      <span className="text-xs">127 memories</span>
+      <span className="text-xs">12 topics</span>
+      {needsAttention > 0 && (
+        <span className="text-xs text-orange-600">⚠️ 3</span>
+      )}
+
+      {/* Period selector */}
+      <Select value={period}>
+        <option>Week</option>
+        <option>Month</option>
+        <option>Year</option>
+      </Select>
     </div>
-
-    {/* Quick stats */}
-    <span className="text-xs">127 memories</span>
-    <span className="text-xs">12 topics</span>
-    {needsAttention > 0 && (
-      <span className="text-xs text-orange-600">⚠️ 3</span>
-    )}
-
-    {/* Period selector */}
-    <Select value={period}>
-      <option>Week</option>
-      <option>Month</option>
-      <option>Year</option>
-    </Select>
   </div>
 </header>
 ```
@@ -1802,6 +2125,312 @@ interface QuickAction {
 - Faster - one click instead of typing
 - Progressive disclosure - expert users can still use `/` commands
 
+### 14. **FullScreenDetailView Component** 🆕
+Provides immersive full-screen views for complex content.
+
+```tsx
+interface FullScreenDetailViewProps {
+  type: 'playbook' | 'memory-detail' | 'evolution-history' | 'contradiction-resolution' | 'guide';
+  enterAnimation: 'slide-right' | 'expand' | 'fade';
+  content: ReactNode;
+  sourceMessageId: string; // For return navigation
+  scrollPosition: number; // Preserve exact position
+  backNavigation: {
+    label: string;
+    returnsToMessageId: string;
+  };
+}
+
+interface NavigationState {
+  mode: 'chat' | 'detail';
+  detailView?: {
+    type: string;
+    data: any;
+    sourceMessageId: string;
+    scrollPosition: number;
+  };
+  history: NavigationEntry[]; // Support browser back button
+}
+```
+
+**Example - Playbook Detail View**:
+```tsx
+<FullScreenView>
+  <Header>
+    <BackButton onClick={returnToChat}>← Back to chat</BackButton>
+    <Title>{playbook.title}</Title>
+    <Actions>
+      <ShareButton />
+      <ExportButton />
+      <EditButton />
+    </Actions>
+  </Header>
+
+  <Content>
+    <TableOfContents />
+    <MainContent>
+      {playbook.sections.map(section => (
+        <Section key={section.id}>
+          <SectionTitle>{section.title}</SectionTitle>
+          <SectionContent>{section.content}</SectionContent>
+          <RelatedMemories>{section.sources}</RelatedMemories>
+        </Section>
+      ))}
+    </MainContent>
+    <Sidebar>
+      <ConfidenceScore />
+      <LastUpdated />
+      <TestResults />
+    </Sidebar>
+  </Content>
+</FullScreenView>
+```
+
+**Transition Animations**:
+```css
+.chat-to-detail {
+  animation: slide-left 0.3s ease-out;
+}
+
+.detail-enter {
+  animation: slide-in-right 0.3s ease-out;
+}
+
+.detail-to-chat {
+  animation: slide-right 0.3s ease-out;
+}
+
+@keyframes slide-left {
+  from { transform: translateX(0); }
+  to { transform: translateX(-100%); }
+}
+
+@keyframes slide-in-right {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+```
+
+**Use Cases**:
+- Viewing generated playbooks and guides
+- Exploring evolution history in detail
+- Reading comprehensive memory details
+- Resolving contradictions with full context
+- Browsing pattern discoveries
+
+**Benefits**:
+- Immersive reading experience
+- No cramped side panels
+- Rich formatting and navigation
+- Seamless transition with preserved scroll position
+
+### 15. **EnhancedScrollbar Component** 🆕
+Smart scrollbar with activity overlay and content type indicators.
+
+```tsx
+interface EnhancedScrollbarProps {
+  // Visual indicators for generated content
+  milestones: Array<{
+    position: number; // % from top
+    type: 'playbook' | 'memory' | 'contradiction' | 'breakthrough' | 'guide' | 'pattern';
+    icon: string; // 📋 📝 ⚡ 💡 📖 🔍
+    tooltip: string;
+    messageId: string;
+  }>;
+
+  // Density visualization
+  densityMap: number[]; // Memory density per segment
+
+  // Current view indicator
+  viewport: {
+    start: number;
+    end: number;
+    highlight: boolean;
+  };
+}
+```
+
+### 16. **MetacognitiveInsightWidget Component** 🆕
+Shows thinking pattern insights and coaching.
+
+```tsx
+interface MetacognitiveInsightWidgetProps {
+  insight: {
+    type: 'bias-detection' | 'pattern-found' | 'calibration-issue' | 'learning-style';
+    title: string;
+    description: string;
+    evidence: Evidence[];
+    recommendation?: string;
+    severity?: 'info' | 'warning' | 'critical';
+  };
+  onDismiss: () => void;
+  onLearnMore: () => void;
+}
+```
+
+**Renders as:**
+```
+┌─────────────────────────────────────────────────┐
+│ 🧠 Metacognitive Insight                        │
+├─────────────────────────────────────────────────┤
+│ Pattern: Overconfidence in technical domains    │
+│                                                  │
+│ Your 90%+ confidence predictions succeed 45%    │
+│ of the time when dealing with:                  │
+│ • System architecture                            │
+│ • Timeline estimates                             │
+│ • Performance optimization                       │
+│                                                  │
+│ Recommendation: Add "needs prototype" flag      │
+│ when confidence > 85% in these areas.           │
+│                                                  │
+│ [Adjust my defaults] [Learn more] [Dismiss]     │
+└─────────────────────────────────────────────────┘
+```
+
+### 17. **CalibrationTrainingWidget Component** 🆕
+Interactive confidence calibration exercises.
+
+```tsx
+interface CalibrationTrainingWidgetProps {
+  history: CalibrationHistory;
+  currentExercise?: CalibrationExercise;
+  onComplete: (result: CalibrationResult) => void;
+}
+```
+
+**Monthly Calibration Report:**
+```
+┌─────────────────────────────────────────────────┐
+│ 📊 Your Confidence Calibration                  │
+├─────────────────────────────────────────────────┤
+│ Your Predictions vs Reality:                    │
+│                                                  │
+│ 90-100% confident → 72% accurate ⚠️             │
+│ 70-89% confident → 68% accurate ✓              │
+│ 50-69% confident → 61% accurate ✓              │
+│ 30-49% confident → 38% accurate ✓              │
+│                                                  │
+│ Suggestion: When you feel 90%+ confident,       │
+│ consider dropping to 75% by default.           │
+│                                                  │
+│ Best calibrated: People skills (±5%)           │
+│ Needs work: Technical predictions (±23%)        │
+│                                                  │
+│ [Start calibration exercise] [See examples]     │
+└─────────────────────────────────────────────────┘
+```
+
+### 18. **TeamPerspectiveWidget Component** 🆕
+Shows collective intelligence and team divergence.
+
+```tsx
+interface TeamPerspectiveWidgetProps {
+  topic: string;
+  perspectives: UserPerspective[];
+  consensus: number;
+  divergence: DivergencePoint[];
+  collectiveInsight?: string;
+}
+```
+
+### 19. **ProvenanceVisualizationWidget Component** 🆕
+Shows complete origin story and influence map.
+
+```tsx
+interface ProvenanceVisualizationWidgetProps {
+  belief: Memory;
+  chain: EvidenceChain;
+  influences: InfluenceMap;
+  attribution: AttributionBreakdown;
+}
+```
+
+**Renders as:**
+```
+📍 Origin Point (Jan 2024)
+└─ Read: Martin Fowler article (40% confidence)
+   └─ Reinforced: AWS workshop (→ 60%)
+      └─ Validated: First project (→ 85%)
+         └─ Challenged: Team feedback (→ 72%)
+            └─ Current: Context-dependent (72%)
+
+Influence Network:
+[Article: 30%] → [Your Experience: 45%] ← [Team: 25%]
+                           ↓
+                  [Current Belief: 72%]
+
+[View full chain] [Export provenance]
+```
+
+### 20. **QuickCaptureIndicator Component** 🆕
+Visual feedback for quick capture shortcuts.
+
+```tsx
+interface QuickCaptureIndicatorProps {
+  type: '!' | '+' | '-' | '?' | '@' | '#' | '~';
+  content: string;
+  status: 'capturing' | 'processing' | 'complete';
+  result?: CaptureResult;
+}
+```
+
+**Visual Feedback:**
+```
+You: !gym Morning workouts drain energy
+
+[Toast notification]
+⚡ Contradiction captured
+Previous: "Morning exercise energizes" (75%)
+New: "Morning workouts drain" (pending)
+[Resolve now] [Process later] [✓]
+```
+
+**Visual Design**:
+```css
+/* Enhanced scrollbar with milestone markers */
+.enhanced-scrollbar {
+  position: fixed;
+  right: 0;
+  top: 0;
+  width: 12px;
+  height: 100vh;
+  background: linear-gradient(
+    to bottom,
+    rgba(var(--density-color), var(--density-1)),
+    rgba(var(--density-color), var(--density-2)),
+    /* ... density gradient based on memory activity ... */
+  );
+}
+
+.scrollbar-milestone {
+  position: absolute;
+  right: 2px;
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.scrollbar-milestone:hover {
+  transform: scale(1.2);
+}
+
+/* Content type icons */
+.milestone-playbook { content: '📋'; }
+.milestone-guide { content: '📖'; }
+.milestone-contradiction { content: '⚡'; }
+.milestone-breakthrough { content: '💡'; }
+.milestone-pattern { content: '🔍'; }
+.milestone-memory { content: '🧠'; }
+```
+
+**Interactive Behavior**:
+- Hover on icon → show tooltip with content preview
+- Click on icon → smooth scroll to that content
+- Density gradient shows memory activity levels
+- Current viewport highlighted
+
 ---
 
 ## 🕐 Temporal Navigation Pattern
@@ -2155,11 +2784,160 @@ User: Let's schedule the team sync
 AI: Great! For the team sync, would morning work?
 ```
 
+### 5. **Smart Context During Knowledge Sharing** 🆕
+
+**Problem**: When users are sharing knowledge or asking questions, relevant context should be visible.
+
+**Solution**: Dynamic context panel appears during thinking process.
+
+```tsx
+interface SmartContextPanel {
+  mode: 'knowledge-entry' | 'question-asking' | 'exploration';
+  visibility: 'collapsed' | 'sidebar' | 'overlay';
+
+  panels: {
+    relatedMemories?: Memory[];
+    potentialContradictions?: Contradiction[];
+    suggestedConnections?: Connection[];
+    confidenceLevels?: ConfidenceScore[];
+    activeContext?: WorkingMemoryItem[];
+  };
+}
+```
+
+**User Experience - Knowledge Entry**:
+```
+User: I've been learning about async programming and realized
+      that promises aren't always better than callbacks...
+
+💭 Thinking...
+→ Detecting knowledge sharing
+→ Showing contextual sidebar
+
+┌─ Contextual Intelligence ─────┐
+│ 📚 Related Memories (3)        │
+│ • "Async/await simplifies..."  │
+│ • "Callbacks for simple..."    │
+│ • "Promise chains can..."      │
+│                                │
+│ ⚡ Potential Contradiction     │
+│ Earlier: "Always use promises" │
+│ Now: "Not always better"       │
+│ [Resolve this →]               │
+│                                │
+│ 🔗 Suggested Connections       │
+│ • Error handling patterns      │
+│ • Performance considerations   │
+│                                │
+│ 📊 Confidence Analysis         │
+│ Current statement: 65%         │
+│ (Needs validation)             │
+└────────────────────────────────┘
+
+AI: Interesting insight! This contradicts your earlier belief...
+```
+
+**User Experience - Question Asking**:
+```
+User: What's my approach to error handling in async code?
+
+💭 Thinking...
+→ Searching relevant memories
+→ Showing context panel
+
+┌─ Memory Context ──────────────┐
+│ 📚 Found 8 related memories   │
+│                               │
+│ High Confidence (>80%):       │
+│ • Try-catch with async/await  │
+│ • .catch() for promises       │
+│                               │
+│ Medium Confidence (50-80%):   │
+│ • Error boundaries in React   │
+│ • Global error handlers       │
+│                               │
+│ Untested (<50%):             │
+│ • Retry mechanisms           │
+│ • Circuit breakers           │
+│                               │
+│ 📅 Last tested: 23 days ago  │
+│ [Test knowledge →]            │
+└───────────────────────────────┘
+
+AI: Based on your experience, you prefer...
+```
+
+**Implementation**:
+```tsx
+// Dynamic panel that appears during thinking
+function SmartContextPanel({ mode, content }) {
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  // Only show when relevant
+  if (!hasRelevantContext(content)) return null;
+
+  return (
+    <div className={`
+      fixed right-4 top-20
+      ${isExpanded ? 'w-80' : 'w-12'}
+      transition-all duration-300
+      bg-white shadow-lg rounded-lg
+      border border-gray-200
+    `}>
+      {isExpanded ? (
+        <ExpandedContext {...content} />
+      ) : (
+        <CollapsedIndicator
+          onClick={() => setIsExpanded(true)}
+          count={content.totalItems}
+        />
+      )}
+    </div>
+  );
+}
+```
+
+**Benefits**:
+- Context-aware assistance during knowledge entry
+- Proactive contradiction detection
+- Confidence visualization
+- Connection suggestions
+- Non-intrusive (appears only when relevant)
+
 ---
 
 ## 📐 Implementation Phases
 
-### **Phase 0.5: Onboarding & Cold Start** (3-4 days) 🆕
+### **Phase 0: Full-Screen Navigation System** (1 week) 🆕
+**Goal**: Build the foundation for immersive detail views with seamless navigation
+
+**Tasks**:
+1. Create `NavigationState` management system
+2. Build `FullScreenDetailView` component framework
+3. Implement slide transition animations (chat ↔ detail)
+4. Create back button with scroll position preservation
+5. Add browser back button support (history API)
+6. Build detail view templates for:
+   - Playbook detail view
+   - Memory detail view
+   - Evolution history view
+   - Contradiction resolution view
+   - Pattern discovery view
+7. Implement `EnhancedScrollbar` with milestone icons
+8. Add content type indicators (📋 📖 ⚡ 💡 🔍)
+9. Test navigation flow with mock data
+10. Add loading states for detail view transitions
+
+**Success**:
+- Smooth transitions between chat and detail views
+- Back button preserves exact scroll position
+- Rich, immersive detail views for all content types
+- Smart scroll shows generated content icons
+- No side panels - full viewport utilization
+
+---
+
+### **Phase 0.5: Onboarding & Cold Start** (3-4 days)
 **Goal**: Address cold start problem and guide first-time users
 
 **Tasks**:
@@ -2199,12 +2977,12 @@ AI: Great! For the team sync, would morning work?
 ---
 
 ### **Phase 1.5: Memory Activity Visualization** (3-4 days)
-**Goal**: Add temporal awareness layer with heatmap and enhanced scrollbar
+**Goal**: Add temporal awareness layer with always-visible heatmap
 
 **Tasks**:
-1. Create `MemoryActivityHeatmap` component (condensed + expanded states)
-2. Implement GitHub-style `ContributionGraph` widget
-3. Build `EnhancedScrollbar` with activity overlay
+1. Create `MemoryActivityHeatmap` component (always-visible + expanded states)
+2. Add ultra-minimal activity sparkline (always present)
+3. Implement GitHub-style `ContributionGraph` widget
 4. Add `SmartDateHeader` components in chat
 5. Implement milestone-based intensity calculation (not volume-based)
 6. Add milestone detection algorithm (breakthroughs, mastery, etc.)
@@ -2268,22 +3046,37 @@ AI: Great! For the team sync, would morning work?
 
 ---
 
-### **Phase 3: Visual Widgets** (2 weeks)
-**Goal**: Embed complex visualizations in chat
+### **Phase 3: Visual Widgets & Metacognitive Features** (2.5 weeks)
+**Goal**: Embed complex visualizations and metacognitive intelligence in chat
 
-**Tasks**:
+**Core Widgets**:
 1. `EvolutionTimelineWidget` (interactive timeline with temporal navigation)
 2. `ContradictionComparisonWidget` (side-by-side with "View conversation" links)
 3. `StatsWidget` (health dashboard)
 4. `PlaybookPreviewCard` (expandable guide)
-5. `PatternDiscoveryWidget` (AI-detected patterns from Wave 5) 🆕
-6. `MemoryEditMode` (inline editing for memory cards) 🆕
-7. `BulkManagementMode` (batch operations UI) 🆕
-8. Make all widgets collapsible/expandable
-9. Add widget-specific actions
-10. Implement widget state persistence (localStorage)
+5. `PatternDiscoveryWidget` (AI-detected patterns from Wave 5)
+6. `MemoryEditMode` (inline editing for memory cards)
+7. `BulkManagementMode` (batch operations UI)
 
-**Success**: Complex data shown beautifully in chat, patterns surfaced, editing enabled
+**Metacognitive Widgets**:
+8. `MetacognitiveInsightWidget` (bias detection, pattern insights)
+9. `CalibrationTrainingWidget` (confidence accuracy exercises)
+10. `TeamPerspectiveWidget` (collective intelligence views)
+11. `ProvenanceVisualizationWidget` (origin stories, influence maps)
+12. `QuickCaptureIndicator` (visual feedback for shortcuts)
+
+**Infrastructure**:
+13. Implement metacognitive pattern detection engine
+14. Add causality tracking system
+15. Build collaborative intelligence layer
+16. Create provenance tracking system
+17. Add thinking style detection
+18. Implement quick capture parser
+19. Make all widgets collapsible/expandable
+20. Add widget-specific actions
+21. Implement widget state persistence
+
+**Success**: Complex data shown beautifully, metacognitive insights surfaced, team perspectives visible
 
 ---
 
@@ -2378,26 +3171,54 @@ Answers to key questions from planning session:
 ```
 Current Structure:              New Structure:
 ├─ ChatInterface.tsx      →    ├─ ChatInterface.tsx (enhanced)
-├─ MemoryList.tsx         →    ├─ OnboardingFlow.tsx (new) 🆕
-├─ Sidebar.tsx            →    ├─ MemoryActivityHeatmap.tsx (new)
-└─ Tabs.tsx               →    ├─ EnhancedScrollbar.tsx (new)
-                                ├─ SmartDateHeader.tsx (new)
-                                ├─ WorkingMemoryIndicator.tsx (new) 🆕
-                                ├─ ThinkingProcess.tsx (new)
-                                ├─ CommandPalette.tsx (new)
-                                ├─ QuickActionButtons.tsx (new)
-                                ├─ widgets/ (new)
+├─ MemoryList.tsx         →    ├─ navigation/
+├─ Sidebar.tsx            →    │  ├─ NavigationState.tsx 🆕
+└─ Tabs.tsx               →    │  ├─ FullScreenDetailView.tsx 🆕
+                                │  └─ TransitionAnimations.tsx 🆕
+                                ├─ metacognition/ 🆕
+                                │  ├─ PatternEngine.tsx
+                                │  ├─ CalibrationSystem.tsx
+                                │  ├─ CoachingEngine.tsx
+                                │  ├─ BiasDetector.tsx
+                                │  └─ ThinkingStyleAdapter.tsx
+                                ├─ collaboration/ 🆕
+                                │  ├─ TeamPerspectives.tsx
+                                │  ├─ ConsensusCalculator.tsx
+                                │  ├─ CollectiveIntelligence.tsx
+                                │  └─ SpaceManager.tsx
+                                ├─ provenance/ 🆕
+                                │  ├─ EvidenceChainBuilder.tsx
+                                │  ├─ CausalityTracker.tsx
+                                │  ├─ InfluenceMapper.tsx
+                                │  └─ AttributionTracker.tsx
+                                ├─ OnboardingFlow.tsx 🆕
+                                ├─ MemoryActivityHeatmap.tsx 🆕
+                                ├─ EnhancedScrollbar.tsx 🆕
+                                ├─ SmartContextPanel.tsx 🆕
+                                ├─ SmartDateHeader.tsx
+                                ├─ WorkingMemoryIndicator.tsx 🆕
+                                ├─ ThinkingProcess.tsx
+                                ├─ CommandPalette.tsx
+                                ├─ QuickActionButtons.tsx
+                                ├─ QuickCaptureParser.tsx 🆕
+                                ├─ widgets/
                                 │  ├─ EvolutionTimeline.tsx
                                 │  ├─ ContradictionComparison.tsx
                                 │  ├─ StatsWidget.tsx
                                 │  ├─ PlaybookPreview.tsx
+                                │  ├─ PlaybookDetailView.tsx 🆕
+                                │  ├─ MemoryDetailView.tsx 🆕
                                 │  ├─ ContributionGraph.tsx
-                                │  ├─ SpacedRepetitionWidget.tsx (new) 🆕
-                                │  ├─ PatternDiscoveryWidget.tsx (new) 🆕
-                                │  ├─ MemoryEditMode.tsx (new) 🆕
-                                │  ├─ BulkManagementMode.tsx (new) 🆕
+                                │  ├─ SpacedRepetitionWidget.tsx 🆕
+                                │  ├─ PatternDiscoveryWidget.tsx 🆕
+                                │  ├─ MemoryEditMode.tsx 🆕
+                                │  ├─ BulkManagementMode.tsx 🆕
+                                │  ├─ MetacognitiveInsightWidget.tsx 🆕
+                                │  ├─ CalibrationTrainingWidget.tsx 🆕
+                                │  ├─ TeamPerspectiveWidget.tsx 🆕
+                                │  ├─ ProvenanceVisualizationWidget.tsx 🆕
                                 │  └─ ThinkingWidget.tsx (base)
-                                └─ ProactiveIntelligence.tsx (new)
+                                └─ ProactiveIntelligence.tsx
 ```
 
 ### **Code Reuse**
@@ -2522,16 +3343,32 @@ if (UI_MODE === 'chat-first') {
 For future consideration:
 
 1. **Quick Actions Menu**: Should non-expert users have a visual menu (☰) in addition to slash commands?
+   - **Update**: Quick action buttons provide this without a menu
 
-2. **Memory Organization**: Without folders/tags UI, how do users categorize memories? (Current answer: semantic search + auto-tagging)
+2. **Memory Organization**: Without folders/tags UI, how do users categorize memories?
+   - **Resolved**: Memory spaces + semantic search + auto-tagging + quick capture modes
 
-3. **Memory Editing**: What's the UX for editing a memory found via search? (Inline edit button in chat?)
+3. **Memory Editing**: What's the UX for editing a memory found via search?
+   - **Resolved**: MemoryEditMode component provides inline editing in chat
 
-4. **Conversation History**: Do users need to see past chat sessions? (Episodic memory = past sessions)
+4. **Conversation History**: Do users need to see past chat sessions?
+   - **Resolved**: Temporal navigation through heatmap and scrollbar provides this
 
-5. **Export Format**: What formats for `/export`? (JSON for backup, Markdown for reading, PDF for sharing?)
+5. **Export Format**: What formats for `/export`?
+   - **Current thinking**: JSON (backup), Markdown (reading), CSV (analysis), PDF (sharing)
 
-6. **Team Features**: How does chat-only work for shared knowledge bases? (Future consideration)
+6. **Team Features**: How does chat-only work for shared knowledge bases?
+   - **Resolved**: TeamPerspectiveWidget + collaborative intelligence layer handles this
+
+**New Open Questions:**
+
+7. **Calibration Frequency**: How often should calibration exercises appear? Weekly? Monthly?
+
+8. **Bias Intervention**: When should the system intervene about detected biases? Threshold?
+
+9. **Privacy in Teams**: How to handle private thoughts in shared spaces?
+
+10. **Metacognitive Onboarding**: Should pattern detection start immediately or after baseline data?
 
 ---
 
@@ -2581,10 +3418,11 @@ For future consideration:
 
 ### **Timeline Comparison**
 
-| Version | Duration | Completeness |
-|---------|----------|--------------|
-| Original (before gaps) | 6.5 weeks | 70% complete |
-| **Updated (with gaps filled)** | **8 weeks** | **95% complete** |
+| Version | Duration | Completeness | Features |
+|---------|----------|--------------|----------|
+| Original (before gaps) | 6.5 weeks | 70% complete | Basic memory & UI |
+| Updated (gaps filled) | 8 weeks | 95% complete | + Testing, patterns, editing |
+| **Complete Metacognitive** | **10-11 weeks** | **100% complete** | + Full metacognition, collaboration, provenance |
 
 ---
 
@@ -2619,7 +3457,19 @@ For future consideration:
   - ✅ Phase 3: MemoryEditMode + BulkManagementMode (editing & batch operations)
   - Updated timeline: 6.5 weeks → 8 weeks (95% complete coverage vs 70%)
   - Added gap analysis summary showing what was missing and how it's now addressed
+- 2025-10-18: **METACOGNITIVE TRANSFORMATION** - Complete vision with metacognitive intelligence:
+  - ✅ Added Metacognitive Intelligence Layer (pattern analysis, bias detection, calibration)
+  - ✅ Added Causality & Decision Tracking (evidence chains, impact analysis, attribution)
+  - ✅ Added Collaborative Intelligence (team perspectives, collective patterns, consensus)
+  - ✅ Added Knowledge Provenance System (origin tracking, influence mapping)
+  - ✅ Added Adaptive Interaction Modes (thinking styles, quick capture, memory spaces)
+  - ✅ Added Multiple "Aha!" Moments design (progressive discovery journey)
+  - ✅ Added 5 new metacognitive widgets (insights, calibration, team, provenance, capture)
+  - ✅ Expanded Phase 3 to include full metacognitive infrastructure
+  - ✅ Updated architecture with 4 new system layers (metacognition, collaboration, provenance, adaptation)
+  - Updated timeline: 8 weeks → 10-11 weeks (100% complete vision)
+  - Transformed from memory system to true metacognitive partner
 
-**Last Updated:** 2025-10-17
-**Next Review:** After Phase 0.5 completion (onboarding)
-**Completeness:** 95% (from 70%)
+**Last Updated:** 2025-10-18
+**Next Review:** After Phase 0 completion (navigation system)
+**Completeness:** 100% (complete metacognitive vision)
